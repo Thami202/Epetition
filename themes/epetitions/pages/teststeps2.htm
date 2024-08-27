@@ -1,0 +1,757 @@
+url = "/teststeps2"
+layout = "default"
+title = "teststeps2"
+==
+<!DOCTYPE html>
+<html>
+  <head>
+   
+  </head>
+  <body>
+    <!-- your HTML content goes here -->
+    <section class="contact spad">
+
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col-lg-12 pb-3">
+
+                    <h5><strong>
+
+                        Request a new e-petition 
+                    </h5>
+
+                </div>
+
+                
+
+                <div class="col-lg-12">
+
+                    
+
+                    <div class="contact__form blue_bg">
+
+                        <form action="#" method="POST" name="apply_finance_form" id="apply_finance_form">
+
+                            <!-- Tab navigation -->
+
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+
+                              <li class="nav-item">
+
+                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Petition details</a>
+
+                              </li>
+
+                              <li class="nav-item">
+
+                                <a class="nav-link" id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">Petition terms</a>
+
+                              </li>
+
+                              <li class="nav-item">
+
+                                <a class="nav-link" id="attachment-tab" data-toggle="tab" href="#attachment" role="tab" aria-controls="attachment" aria-selected="false">Attachment</a>
+
+                              </li>
+
+                              
+                              <li class="nav-item">
+
+                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Your details</a>
+
+                              </li>
+
+                            
+
+                            </ul>
+
+
+
+                            <!-- Tab content -->
+
+
+
+                            <div class="tab-content" id="myTabContent">
+
+                              <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+                               <div class="col-lg-6 offset-lg-3">
+
+                                    <div class="finance__form pt-5">
+
+                                       <!-- <div class="col-lg-12">
+
+                                        <select id="ttle" name="ttle">
+
+                                            <option value="-1">Select Title</option>
+
+                                            <option value="Mr">Mr.</option>
+
+                                            <option vlaue="Ms">Ms.</option>
+
+                                            <option vlaue="Mrs">Mrs.</option>
+
+                                            <option vlaue="Ms">Dr.</option>
+
+                                            <option vlaue="Ms">Ms</option>
+
+                                        </select>
+
+                                      </div>-->
+
+                                            <div class="row">
+
+                                                <!--<div class="col-lg-12 input-group">-->
+
+                                                    <div class="col-lg-6">
+                                                       <label class="formField"><span class="formField-text">Petition Title <span class="mandatory">*</span></span>
+                                                        <input type="text" id="name" name="title" placeholder="Petition Title" required>
+
+                                                        <div class='validation error-display_2' id="error_name"></div>
+                                                    <p><strong><em>Tip:</em></strong>&nbsp;&nbsp;<em>The petition title is a summary of your petition request and the first part of the petition that people will see. Keep it short and to the point.</em><br><br>
+                                                    </div>
+
+                                                    <!-- <div class="col-lg-6">
+
+                                                        <input type="text" id="surname" name="surname" placeholder="Surname" required>
+
+                                                        <div class='validation error-display_2' id="error_surname"></div>
+
+                                                    </div>-->
+
+                                               <!-- </div>-->
+
+                                            </div>
+
+                                            <!--<div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                <p style="color:#FFF;">Are you South African?</p>
+
+                                               </div>
+
+                                               <div class="col-lg-6" style="display:inline-flex;">
+
+                                                
+
+                                                <label  class="pr-3">No</label>
+
+                                                <input type="radio" value="No" name="citizen" id="citizen">
+
+                                                <label class="pr-3">Yes</label>
+
+                                                <input type="radio" value="Yes" name="citizen" id="citizen" checked=true>
+
+                                               </div>
+
+                                            </div>-->
+
+                                            <div class="col-lg-12 div_idnumber">
+											<label class="formField"><span class="formField-text">Intended to <span class="mandatory">*</span></span><span class="formField-validation"></span>
+
+                                              <input type="text" id="intended_to" name="intended_to" placeholder="Intended to"  required>
+                                            <p>Words directed to where the petition is going to.</p>
+                                            </div>
+
+
+
+                                            <!--<div class="col-lg-12 div_passport" style="display:none;">
+
+                                              <input type="text" id="passport" name="passport" placeholder="Passport Number" maxlength="13" onkeypress="return IsNumeric(event);" required>
+
+                                            </div>-->
+
+                                           <!-- <div class="row">
+
+                                            <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="ethnicGroup" name="ethnicGroup" placeholder="Ethnic Group" required>
+
+                                                    <div class='validation error-display_2' id="error_ethnic"></div>
+
+                                                </div>
+
+                                                <div class="col-lg-6">
+
+                                                    <select id="marital" name="marital">
+
+                                                        <option value="-1">Select marital status</option>
+
+                                                        <option value="Single">Single</option>
+
+                                                        <option value="Married">Married</option>
+
+                                                        <option value="Divorced">Divorced</option>
+
+                                                        <option value="Widowed">Widowed</option>
+
+                                                    </select>
+
+
+
+                                                    <div class='validation error-display_2' id="error_marital"></div>
+
+                                                </div>
+
+                                            </div>
+
+                                           </div>-->
+
+                                           <!--<div class="col-lg-12">
+
+                                              <input type="text" id="email" name="email" placeholder="Email Address" required>
+
+                                            </div>-->
+
+                                            <!--<div class="row">
+
+                                            <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="contact" name="contact" placeholder="Contact" maxlength="10"  onkeypress="return IsNumeric(event);" required>
+
+                                                    <div class='validation error-display_2' id="error_contact"></div>
+
+                                                </div>
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="tel" name="tel" maxlength="10" placeholder="Home tel" maxlength="10"  onkeypress="return IsNumeric(event);" required>
+
+                                                    <div class='validation error-display_2' id="error_tel"></div>
+
+                                                </div>
+
+                                            </div>
+
+                                           </div>-->
+
+                                        
+
+                                    </div>
+
+                                </div>
+
+                              
+
+                                <!-- Tab carousel -->
+
+                                <div class="col-lg-6 offset-lg-3 pb-4">
+
+                                    <button class="prevtab btn-override btn btn-success">Prev</button>
+
+                                    <button class="nexttab btn-override btn btn-success">Next</button>
+
+                                </div>
+
+                              </div>
+
+                              <!----->
+
+
+
+                              <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+
+                                <div class="col-lg-6 offset-lg-3">
+
+                                    <div class="finance__form pt-5">
+
+                                            <!--<div class="row">
+
+                                                <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="streetNo" name="streetNo" placeholder="Street No." required>
+
+                                                    <div class='validation error-display_2' id="error_streetNo"></div>
+
+                                                </div>
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="streetName" name="streetName" placeholder="Street Name" required>
+
+                                                    <div class='validation error-display_2' id="error_streetName"></div>
+
+                                                </div>
+
+                                                </div>
+
+                                            </div>-->
+
+                                            <!--<div class="col-lg-12">
+
+                                            <input type="text" id="suburb" name="suburb" placeholder="Suburb" required>
+
+                                            </div>
+
+
+
+                                            <div class="col-lg-12">
+
+                                            <input type="text" id="town" name="town" placeholder="Town" required>
+
+                                            </div>-->
+
+
+
+                                            <!--<div class="col-lg-12">
+
+                                            <input type="text" id="residentialStatus" name="residentialStatus" placeholder="Residential status e.g. Owner or Tenant" required>
+
+                                            </div>-->
+
+                                            <section class="fieldset">
+
+                                             <h1>Terms of your petition :</h1>
+
+                                              <!-- <div class="col-lg-12">
+
+                                                <input type="text" id="kinName" name="kinName" placeholder="Name" required>
+
+                                               </div>-->
+
+                                              <!-- <div class="row">
+
+                                                <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="contactKin" name="contactKin" placeholder="Contact" maxlength="10"  onkeypress="return IsNumeric(event);" required>
+
+                                                    <div class='validation error-display_2' id="error_contactKin"></div>
+
+                                                </div>
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="relationship" name="relationship" placeholder="Relationship" required>
+
+                                                    <div class='validation error-display_2' id="error_relationship"></div>
+
+                                                </div>
+
+                                                </div>
+
+                                               </div>-->
+
+                                               <div class="col-lg-12">
+                                                <label for="textAreaField" style="color:black;" class="text-info">Description <span class="mandatory">*</span</label><br> 
+                                                <textarea style="margin-bottom: 0 !important;" placeholder="Address" id="decription" name="decription"></textarea>
+                                                    <p>The reason explains what the problem is and why you are asking for change.&nbsp;</p> 
+                                               </div>
+
+                                            </section>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Tab carousel -->
+
+                                <div class="col-lg-6 offset-lg-3 pt-3 pb-4">
+
+                                    <button class="prevtab btn-override btn btn-success">Prev</button>
+
+                                    <button class="nexttab btn-override btn btn-success">Next</button>
+
+                                </div>
+
+                              </div>
+
+                              <!----->
+
+                              <div class="tab-pane fade" id="attachment" role="tabpanel" aria-labelledby="attachment-tab">
+
+                                <div class="col-lg-6 offset-lg-3">
+
+                                    <div class="finance__form pt-5">
+
+                                        <div class="col-lg-12">
+                                   <h3>Attachment of your petition </h3>
+                                          <input type="file" class="form-control" name="doc_type" />
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-lg-12 input-group">
+                                              <h3>Attachment of your petition </h3>
+                                                <div class="col-lg-6">
+                                                     <input type="file" class="form-control" name="doc_type" />
+                                                    <!--<input type="text" id="occupation" name="occupation" placeholder="Occupation" required>-->
+
+                                                    <div class='validation error-display_2' id="error_occupation"></div>
+
+                                                </div>
+
+                                               <!-- <div class="col-lg-6">
+
+                                                    <select id="employmentStatus" name="employmentStatus" required>
+
+                                                        <option value="-1">Select employement status</option>
+
+                                                        <option value="Full-Time">Full-Time</option>
+
+                                                        <option value="Part-time">Part Time</option>
+
+                                                        <option value="Self-Employed">Self-Employed</option>
+
+                                                    </select>
+
+                                                    <div class='validation error-display_2' id="error_employmentStatus"></div>
+
+                                                </div>-->
+
+                                            </div>
+
+                                        </div>
+
+                                           <!-- <div class="col-lg-12">
+
+                                                 <input type="text" id="employmentPeriod" name="employmentPeriod" placeholder="Employment Period" required>
+
+                                            </div>
+
+                                            <div class="col-lg-12">
+
+                                                 <input type="text" id="employmentTel" name="employmentTel" placeholder="Tel No."  onkeypress="return IsNumeric(event);" maxlength="10" required>
+
+                                            </div>-->
+
+                                      	   <!--<div class="col-lg-12">
+                                                 <select id="txtBank" name="txtBank">
+                                                    <option value="-1">Select Bank</option>
+                                                    <option value="Capitec">Capitec</option>
+                                                    <option value="First National Bank">FNB</option>
+                                                    <option value="Investec">Investec</option>
+                                                    <option value="Standard Bank">Standard Bank</option>
+                                                    <option value="TymeBank">TymeBank</option>
+                                                 </select>
+                                            </div>-->
+					     <!--<div class="col-lg-12">
+                                                <select id="acctType" name="acctType">
+                                                    <option value="-1">Select Account Type</option>
+                                                    <option value="Savings">Savings</option>
+                                                    <option value="Cheque">Cheque</option>
+                                                </select>
+                                            </div>-->
+
+                                           <!-- <div class="col-lg-12">
+                                                 <input type="text" id="txtAcct" name="txtAcct" placeholder="Account Number."  onkeypress="return IsNumeric(event);" required>
+                                            </div>-->
+
+                                        
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Tab carousel -->
+
+                                <div class="col-lg-6 offset-lg-3 pb-4">
+
+                                    <button class="prevtab btn-override btn btn-success">Prev</button>
+                                 <button class="nexttab btn-override btn btn-success">Next</button>
+                                    
+
+                                </div>
+
+                              </div>
+                         <!--profile-->
+						  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                               <h3 class="petitionSecondaryTitle">Please fill in your details – you are the Principal Petitioner</h3>
+                               <div class="col-lg-6 offset-lg-3">
+
+                                    <div class="finance__form pt-5">
+
+                                       <!-- <div class="col-lg-12">
+
+                                        <select id="ttle" name="ttle">
+
+                                            <option value="-1">Select Title</option>
+
+                                            <option value="Mr">Mr.</option>
+
+                                            <option vlaue="Ms">Ms.</option>
+
+                                            <option vlaue="Mrs">Mrs.</option>
+
+                                            <option vlaue="Ms">Dr.</option>
+
+                                            <option vlaue="Ms">Ms</option>
+
+                                        </select>
+
+                                      </div>-->
+
+                                            <div class="row">
+
+                                                <!--<div class="col-lg-12 input-group">-->
+
+                                                    <div class="col-lg-6">
+                                                       <label class="formField"><span class="formField-text">Full Name <span class="mandatory">*</span></span>
+                                                        <input type="text" id="name" name="name" placeholder="Full Name" required>
+
+                                                        <div class='validation error-display_2' id="error_name"></div>
+                                                    
+                                                    </div>
+
+                                                    <!-- <div class="col-lg-6">
+
+                                                        <input type="text" id="surname" name="surname" placeholder="Surname" required>
+
+                                                        <div class='validation error-display_2' id="error_surname"></div>
+
+                                                    </div>-->
+
+                                               <!-- </div>-->
+
+                                            </div>
+
+                                          <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                <p style="color:#FFF;">Are you South African?</p>
+
+                                               </div>
+
+                                               <div class="col-lg-6" style="display:inline-flex;">
+
+                                                
+
+                                                <label  class="pr-3">No</label>
+
+                                                <input type="radio" value="No" name="citizen" id="citizen">
+
+                                                <label class="pr-3">Yes</label>
+
+                                                <input type="radio" value="Yes" name="citizen" id="citizen" checked=true>
+
+                                               </div>
+
+                                            </div>
+
+                                            <div class="col-lg-12 div_idnumber">
+											<label class="formField"><span class="formField-text">Intended to <span class="mandatory">*</span></span><span class="formField-validation"></span>
+
+                                              <input type="text" id="id_number" name="id_number" placeholder="Id_number" maxlength="13" onkeypress="return IsNumeric(event);"  required>
+                                            
+                                            </div>
+
+
+
+                                            <div class="col-lg-12 div_passport" style="display:none;">
+
+                                              <input type="text" id="passport" name="passport" placeholder="Passport Number" maxlength="13" onkeypress="return IsNumeric(event);" required>
+
+                                            </div>
+											
+											<div class="form-group">
+                                               <label for="registerPhoneNumber">Phone Number</label>
+                                                  <input name="phone_number" maxlength="10" type="text" class="form-control" id="registerPhoneNumber"
+                                                   placeholder="Enter Phone Number" />
+                                              </div>
+											  
+											  
+											<div class="form-group">
+											<label for="registerProvince">Province</label><br>
+											<select id="select-field1" onchange="updateSelectField()" name="province" class="form-control">
+											<option value="">Select...</option>
+											<option value="0">Eastern Cape</option>
+											<option value="1">Free State</option>
+											<option value="Gauteng">Gauteng</option>
+											<option value="KwaZulu-Natal">KwaZulu-Natal</option>
+											<option value="Limpopo">Limpopo</option>
+											<option value="Mpumalanga">Mpumalanga</option>
+											<option value="Northern Cape">Northern Cape</option>
+											<option value="North West">North West</option>
+											<option value="Western Cape">Western Cape</option>
+											</select>
+											</div>
+
+									<div class="form-group">
+									<label for="registerMunicipality">Municipality</label>
+
+								<select id="select-field2" name="municipality" class="form-control">
+								<option value="City Of Cape Town">City Of Cape Town</option>
+										</select>
+
+   
+										</div>
+										
+										<div class="col-lg-12">
+                                               <label for="registerEmail">Email</label>
+                                              <input type="text" id="email" name="email" placeholder="Email Address" required>
+
+                                            </div>
+
+                                           <!-- <div class="row">
+
+                                            <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="ethnicGroup" name="ethnicGroup" placeholder="Ethnic Group" required>
+
+                                                    <div class='validation error-display_2' id="error_ethnic"></div>
+
+                                                </div>
+
+                                                <div class="col-lg-6">
+
+                                                    <select id="marital" name="marital">
+
+                                                        <option value="-1">Select marital status</option>
+
+                                                        <option value="Single">Single</option>
+
+                                                        <option value="Married">Married</option>
+
+                                                        <option value="Divorced">Divorced</option>
+
+                                                        <option value="Widowed">Widowed</option>
+
+                                                    </select>
+
+
+
+                                                    <div class='validation error-display_2' id="error_marital"></div>
+
+                                                </div>
+
+                                            </div>
+
+                                           </div>-->
+
+                                           
+
+                                            <!--<div class="row">
+
+                                            <div class="col-lg-12 input-group">
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="contact" name="contact" placeholder="Contact" maxlength="10"  onkeypress="return IsNumeric(event);" required>
+
+                                                    <div class='validation error-display_2' id="error_contact"></div>
+
+                                                </div>
+
+                                                <div class="col-lg-6">
+
+                                                    <input type="text" id="tel" name="tel" maxlength="10" placeholder="Home tel" maxlength="10"  onkeypress="return IsNumeric(event);" required>
+
+                                                    <div class='validation error-display_2' id="error_tel"></div>
+
+                                                </div>
+
+                                            </div>
+
+                                           </div>-->
+
+                                        
+
+                                    </div>
+
+                                </div>
+
+                              
+
+                                <!-- Tab carousel -->
+
+                                <div class="col-lg-6 offset-lg-3 pb-4">
+
+                                    <button class="prevtab btn-override btn btn-success">Prev</button>
+                                   <button class="btnDecision btn-override btn btn-success">Submit</button>
+                                    
+
+                                </div>
+
+                              </div>
+
+						 <!--end-->
+                              
+
+                            </div>
+
+                             
+
+                       </form>      
+
+                    </div>
+
+               
+
+                </div>
+
+                
+
+            </div>
+
+        </div>
+
+      
+
+    </section>
+  </body>
+</html>
+      
+            <!-- <link href="{{  'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/style.css'  }}" rel="stylesheet">
+             <link href="{{  'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/owl.carousel.min.css'}}" rel="stylesheet">
+             <link href="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/slicknav.min.css' }}" rel="stylesheet">
+             <link href="{{'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/nice-select.css'   }}" rel="stylesheet">
+             <link href="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/magnific-popup.css'   }}" rel="stylesheet">
+             <link href="{{'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/jquery-ui.min.css'  }}" rel="stylesheet">
+             <link href="{{  'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/font-awesome.min.css'  }}" rel="stylesheet">
+             <link href="{{  'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/elegant-icons.css' }}" rel="stylesheet">
+             <link href="{{  'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/bootstrap.min.css'  }}" rel="stylesheet">
+             <link href="{{  'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/css/bootstrap.css' }}" rel="stylesheet">-->
+   
+
+
+    <!-- <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/jquery-3.3.1.min.js'  }}"> </script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/bootstrap.min.js'}}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/jquery-ui.min.js' }}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/jquery.magnific-popup.min.js'}}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/mixitup.min.js'  }}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/jquery.slicknav.js' }}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/owl.carousel.min.js'  }}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js/finance_validation.js'  }}"></script>
+     <script src="{{ 'http://localhost:8081/petitionproject/themes/rainlab-vanilla/assets/js//main.js' }}"></script>-->
+
+
+
+	
+	
+
+
+       <script  type="text/javascript">
+
+      var specialKeys = new Array();
+
+        specialKeys.push(8); //Backspace  idPassNumber
+
+        function IsNumeric(e) {
+
+            var keyCode = e.which ? e.which : e.keyCode;
+
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) !== -1);
+
+            if(ret ==false ){alert("this field accept number only.")};
+
+            return ret;
+
+        }
+
+    
+
+</script>

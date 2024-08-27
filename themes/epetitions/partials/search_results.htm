@@ -1,0 +1,25 @@
+==
+{% if petitions is empty %}
+    No results found
+{% else %}
+    <ul>
+        {% for petition in petitions %}
+        <a href="{{'petition/'~petition.id}}"><p class="story-headline">{{petition.title}}</p></a>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<style>
+.story-headline {
+    padding: 10px;
+    padding-left: 10px;
+    position: relative;
+    font-family: ff-dax-pro, sans-serif;
+    border-bottom: 1px solid #f6f3ec;
+    text-transform: uppercase;
+    letter-spacing: -0.7px;
+    line-height: 1.2;
+    color: #275937;
+
+  }
+</style>

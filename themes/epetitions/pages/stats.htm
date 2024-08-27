@@ -1,0 +1,304 @@
+title = "stats"
+url = "/stats"
+layout = "default"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use AhmadFatoni\ApiGenerator\Controllers\ApiGenerator\api\PetitionController;
+use Exception;
+use Http;
+
+
+function onStart()
+{
+    
+    
+    $this->addJs('assets/mine/Chart.js');
+    // $this->addJs('assets/javascript/fontawesome.min.js');
+    try {
+        
+       $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:3');
+
+        $petitions = json_decode($response)->data;
+
+        foreach ($petitions as $petition) {
+             if (!empty($petition->id)) {
+                 
+                 
+                    // Exclude removed and withdrawn petitions
+                 
+            $countResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/active-count');
+            
+            $response_data = json_decode($countResponse);
+            
+            if ($response_data && isset($response_data->count)) {
+                $petition->activepetition_count = $response_data->count;
+            } else {
+                $petition->activepetition_count = 0;
+            }
+            
+             }
+        }
+        
+        $this['active'] = $petitions;
+        
+        
+         $closedresponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:4');
+
+$closedpetitions = json_decode($closedresponse)->data;
+       
+
+        foreach ($closedpetitions as $closedpetition) {
+            if (!empty($closedpetition->id)) {
+            $countResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$closedpetition->id.'/closedpetition-count');
+           // $closedpetition_count = json_decode($countResponse)->count;
+          //  $closedpetition->closedpetition_count = $closedpetition_count;
+            
+            
+               $response_data = json_decode($countResponse);
+              if ($response_data && isset($response_data->count)) {
+             $closedpetition_count = $response_data->count;
+            $closedpetition->closedpetition_count =  $closedpetition_count;
+             } else {
+              $closedpetition->closedpetition_count = 0;
+              }
+            
+            
+            
+            }
+        }
+
+        $this['closedpetitions'] = $closedpetitions;
+      
+        
+        
+ $userId = Auth::getUser() ? Auth::getUser()->id : 0;
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=user_id:is:'. $userId );
+
+//$this['petitions'] = json_decode($response)->data;
+$petitions = json_decode($response)->data;
+
+// Add the signature count to each petition
+foreach ($petitions as $petition) {
+  if(!empty($petition->id)){
+  $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/comments-count');
+  //$signature_count = json_decode($response)->count;
+  //$petition->signature_count = $signature_count;
+  //url not working
+  $response_data = json_decode($response);
+  if ($response_data && isset($response_data->count)) {
+    $comments_count = $response_data->count;
+    $petition->comments_count = $comments_count;
+  } else {
+    $petition->comments_count = 0;
+  }
+
+
+
+  }
+}
+
+
+$this['comments'] =  $petitions;
+
+
+     
+ $userId = Auth::getUser() ? Auth::getUser()->id : 0;
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=user_id:is:'. $userId );
+
+//$this['petitions'] = json_decode($response)->data;
+$petitions = json_decode($response)->data;
+
+// Add the signature count to each petition
+foreach ($petitions as $petition) {
+  if(!empty($petition->id)){
+  $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/withdraw-count');
+  //$signature_count = json_decode($response)->count;
+  //$petition->signature_count = $signature_count;
+  
+  $response_data = json_decode($response);
+  if ($response_data && isset($response_data->count)) {
+    $withdraw_count = $response_data->count;
+    $petition->withdraw_count = $withdraw_count;
+  } else {
+    $petition->withdraw_count = 0;
+  }
+
+
+
+  }
+}
+
+
+
+$this['withdraw'] =  $petitions;
+
+
+
+
+     
+$userId = Auth::getUser() ? Auth::getUser()->id : 0;
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=user_id:is:'. $userId );
+
+//$this['petitions'] = json_decode($response)->data;
+$petitions = json_decode($response)->data;
+
+// count week
+foreach ($petitions as $petition) {
+  if(!empty($petition->created_at)){
+  $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->created_at.'/count-week');
+  
+  $response_data = json_decode($response);
+  if ($response_data && isset($response_data->count)) {
+    $week_count = $response_data->count;
+    $petition->week_count = $week_count;
+  } else {
+    $petition->week_count = 0;
+  }
+
+
+
+  }
+}
+
+
+
+$this['week'] =  $petitions;
+
+// count Month
+foreach ($petitions as $petition) {
+  if(!empty($petition->created_at)){
+  $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->created_at.'/month-count');
+  
+  $response_data = json_decode($response);
+  if ($response_data && isset($response_data->count)) {
+    $month_count = $response_data->count;
+    $petition->month_count = $month_count;
+  } else {
+    $petition->month_count = 0;
+  }
+
+
+
+  }
+}
+
+
+
+$this['month'] =  $petitions;
+
+
+/* $userId = Auth::getUser() ? Auth::getUser()->id : 0;
+  
+       $response = Http::get('http://localhost:8081/epetitionoctober/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:1 AND user_id:is:' .$userId);
+
+        $petitions = json_decode($response)->data;
+ 
+        foreach ($petitions as $petition) {
+             if (!empty($petition->id)) {
+                 
+                 
+                    // Exclude removed and withdrawn petitions
+                 
+            $countResponse = Http::get('http://localhost:8081/epetitionoctober/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/openpetition-count');
+           // $openpetition_count = json_decode($countResponse)->count;
+           // $petition->openpetition_count = $openpetition_count;
+            
+               $response_data = json_decode($countResponse);
+              if ($response_data && isset($response_data->count)) {
+             $openpetition_count = $response_data->count;
+             $petition->openpetition_count =  $openpetition_count;
+             } else {
+              $petition->openpetition_count = 0;
+              }
+            
+            
+             }
+        }
+        
+        $this['openpetition'] = $petitions;
+*/
+
+
+
+
+
+
+
+        
+        
+    } catch (ApplicationException $e) {
+        $this['petitions'] = [];
+        $this['closedpetitions'] =[];
+    }
+}
+?>
+==
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pie Chart Stats</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Petitions Status</h1>
+  <div id="petitionsContainer">
+  <div style="height: 400px; width: 400px;">
+    <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+  </div>
+</div>
+
+
+<script>
+  var xValues = ["week", "quater", "bi-annaul", "month", "year"];
+var yValues = [5, 15, 30, 25, 102];
+var barColors = [
+  "#b91d47",
+  "#00aba9",
+  "#2b5797",
+  "#e8c3b9",
+  "#1e7145"
+];
+
+new Chart("myChart", {
+  type: "pie",
+  data: {
+    labels: xValues,
+    datasets: [{
+      backgroundColor: barColors,
+      data: yValues
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      
+    }
+  }
+});
+</script>
+
+
+</body>
+</html>
+<br>
+<style>
+canvas#petitionsChart {
+  display: block;
+  margin: 0 auto;
+  max-width: 600px;
+  height: auto;
+}
+
+div#petitionsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
+
+
+</style>

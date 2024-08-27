@@ -1,0 +1,52 @@
+<div class="columns large-9 padding-left">
+<div>
+<div>
+</div>
+<h2 class="petitionSectionTitle">Request a new e-petition </h2>
+<div style ="margin-bottom: 2rem;" class="progressBar" style="background-color: #4275ae;">
+<div class="row">
+<div style ="display: grid;grid-template-columns: repeat(auto-fit, minmax(0, 1fr));"  class="progressBar-container">
+<div  class="progressBar-step progressBar-step-active" {% if current==2 %} style='font-weight: bold;' {% endif %} >
+1. Petition details
+</div>
+<div class="progressBar-step "  {% if current==2 %} style='font-weight: bold;' {% endif %}>
+2. Petition terms
+
+</div>
+<div class="progressBar-step">
+3. Your details</div>
+<div class="progressBar-step">
+4. Confirm</div>
+
+<div class="progressBar-step ">
+5. Verify
+</div>
+</div>
+<div class="show-for-small-only"><p class="progressBar-smalltext">Step 1. Petition details</p>
+</div>
+</div>
+</div>
+<form><h3 class="petitionSecondaryTitle">Please fill in the details of your petition</h3>
+<fieldset><span class="formField-description"><h5 class="formField-text">Petition address</h5>
+<p>To the Hon. Speaker of the House of Representatives and Members of the House of Representatives</p></span><h5 class="formFieldTitle">Petition details</h5>
+<div class="row">
+<input type="hidden" id="clientIP"><input name="petitionAddress" type="hidden" size="75" aria-label="Petition Address" value="To the Hon. Speaker of the House of Representatives and Members of the House of Representatives"><div class="columns large-12">
+
+<div class="form-group">
+    <!--<label for="title" style="color:black;" class="text-info">Title</label><br>
+    <input type="text" name="title" class="form-control" Placeholder="subject of the petition" required />-->
+	<label class="formField"><span class="formField-text">Petition Title <span class="mandatory">*</span></span>
+<span class="formField-validation"></span>
+<input class="formField-input" aria-label="Petition title" type="text" name="title"></label>
+
+</div>
+<p><strong><em>Tip:</em></strong>&nbsp;&nbsp;<em>The petition title is a summary of your petition request and the first part of the petition that people will see. Keep it short and to the point.</em><br><br><strong>Good example</strong><em><br></em>✔ Apply more tax to sugary drinks</p><p><strong>Bad example</strong><em><br></em>✘&nbsp; Drinks that have lots of sugar are bad for your health and should be taxed more</p></div>
+<div class="columns large-12"><label class="formField"><span class="formField-text">Petition Of <span class="mandatory">*</span></span><span class="formField-validation"></span>
+<input class="formField-input" aria-label="Petition Of" type="text" name="petitionOf"></label><p>Words describing who the petition is from, usually 'Certain citizens of Australia'.</p></div></div></fieldset>
+<a class="button cancelStepButton" href="/e-petitions/create/petition/type">Back</a> 
+ <button class="button" type="submit">Next</button>
+
+
+</form>
+</div>
+</div>

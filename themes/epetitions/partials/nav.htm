@@ -1,0 +1,45 @@
+<nav class="navbar navbar-inverse navbar-expand-lg navbar-fixed-top justify-content-end" style="background:#9e7c0c;">
+    <div class="container">
+        <a class="navbar-brand" href="{{ 'home'|page }}">
+            <img src="{{ 'assets/images/october.png'|theme }}" style="height:60px; width: 100% !important">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 text-dark" id="main-horiz-menu">
+
+                {% if user %}
+                  <li class="{% if this.page.id == 'account' %}active{% endif %}">
+                    <a href="{{ 'my-petitions'|page }}">My Petitions</a>
+                  </li>
+                {% else %}                  
+                  
+                  <li class="dropdown">
+                    <a  class="dropdown-toggle" data-toggle="dropdown" href="#">
+                      My Petitions <span class="caret"></span>
+                    </a>
+                    <div class="dropdown-content">
+                      <a style="color:white;background-color:#9e7c0c; padding-top:25px;cursor: pointer;" href="{{ 'signin'|page }}">Sign In</a>
+                    </div>
+                  </li>
+                {% endif %}
+              
+                <li class="{% if this.page.id == 'forum' %}active{% endif %}">
+                  <a href="{{ 'request-petition'|page }}">Request Petition</a>
+                </li>
+              
+                <li class="{% if this.page.id == 'forum' %}active{% endif %}">
+                  <a href="petitions">Petitions</a>
+                </li>
+              
+                {% if user %}
+                  <li>
+                    <a href="javascript:;" data-request="onLogout" data-request-data="redirect: '/signin'">Logout</a>
+                  </li>
+                {% endif %}
+              
+            </ul>
+        </div>
+    </div>
+</nav>

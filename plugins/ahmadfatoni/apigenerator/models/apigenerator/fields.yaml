@@ -1,0 +1,44 @@
+fields:
+    title:
+        label: Title
+        span: auto
+        type: text
+    status_id:
+        label: Status
+        span: auto
+        showSearch: true
+        type: dropdown
+    intended_to:
+        label: Intended_To
+        span: auto
+        type: text    
+    description:
+        label: 'Petition Text'
+        size: huge
+        span: full
+        type: textarea
+
+    reason:
+        label: 'Withdrawal Reason'
+        size: huge
+        span: full
+        type: textarea 
+    comment:
+        label: 'Comment From Government'
+        size: huge
+        span: full
+        type: textarea       
+tabs:
+    fields:
+        documents:
+            label: Attachments
+            span: full
+            mode: file
+            useCaption: true
+            thumbOptions:
+                mode: crop
+                extension: auto
+            type: fileupload
+            tab: Attachments
+        
+       

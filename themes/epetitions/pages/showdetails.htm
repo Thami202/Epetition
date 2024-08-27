@@ -1,0 +1,135 @@
+title = "showdetails"
+url = "/showdetails/:id"
+layout = "default"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+function onStart() {
+
+try{
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/petitions/'.$this->param('id'));
+
+$petitions = json_decode($response);
+
+
+// Add the signature count to each petition
+
+$this['petitions'] = $petitions;
+
+
+
+ }
+    catch(ApplicationException $e) {
+        $this['petitions'] = [];
+    }
+    
+
+}
+?>
+==
+
+<br>
+<h2>Details Of Petition</h2>
+<br>
+<table class="table" >
+    <thead class="story-headline" style="background-color: #Efeade;">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Title</th>
+        <th scope="col">Intended_To</th>
+        <th scope="col">Description</th>
+        
+  
+     
+      </tr>
+    </thead>
+    <tbody class="story-headline">
+     
+      
+   
+      
+      
+      <tr style="word-wrap: break-word;">
+     
+        <th scope="row">{{petitions.id}}</th>
+        <td>{{petitions.title}}</td>
+        <td>{{petitions.intended_to}}</td>
+        <td>{{ petitions.description }}</td>
+       <!-- <td><button style="background-color:#9e7c0c;color:#ffffff;" class="btn btn-default" id="forward-button">Forward</button></td>-->
+
+      </tr>
+      
+   
+    
+    </tbody>
+  </table>
+    </body>
+    
+  
+    </html>
+   
+   
+    <style>
+      .story-headline
+    {
+      padding: 10px;
+      padding-left: 10px;
+      position: relative;
+      font-family: ff-dax-pro, sans-serif;
+      border-bottom: 1px solid #f6f3ec;
+      text-transform: uppercase;
+      letter-spacing: -0.7px;
+      line-height: 1.2;
+      color: #275937;
+  
+    }
+  
+    .story-headline:before {
+      content: "";
+      display: block;
+      position: absolute;
+      height: calc(100% - 4px);
+      left: 0;
+      top: 2px;
+  }
+  
+  a {
+      line-height: inherit;
+      color: #275937;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  
+  
+  td, th {
+    padding: 5px; /* optional: add padding to the cells */
+  }
+  
+    </style>
+
+
+
+
+
+  
+  
+  
+  <script>
+    var forwardButton = document.getElementById("forward-button");
+    if (forwardButton) {
+      forwardButton.addEventListener("click", function() {
+        // Perform any necessary actions when the button is clicked
+        // For example, you could redirect the user to a form where they can
+        // enter the information for the department they want to forward the petition to
+        // or you could display a modal window that allows the user to select from a list
+        // of departments that the petition can be forwarded to
+      });
+    }
+  </script>
+  

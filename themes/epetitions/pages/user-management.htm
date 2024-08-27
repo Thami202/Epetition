@@ -1,0 +1,76 @@
+url = "/usermanagement"
+layout = "default"
+title = "User Management"
+==
+<?php
+use Rainlab\User\Models\User;
+
+function onStart()
+{
+  $this['users'] = User::all();
+    
+
+}
+
+function onDelete()
+{
+
+    $user = User::find(post('id'));
+    $user->delete();
+
+    
+    return Redirect('/usermanagement');
+
+}
+?>
+==
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>User Management</title>
+  </head>
+  <body>
+<div class="container">
+<br>
+<h3> User Inf </h3>
+
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Registered</th>
+      <th scope="col">Last Seen</th>
+      <th scope="col">Action</th>
+
+   
+       
+      <td>
+   
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+ {% for user in users %}
+  
+    <tr>
+      <th scope="row">{{user.id}}</th>
+      <td>{{user.name}}</td>
+      <td>{{user.email}}</td>
+      <td>{{user.last_login}}</td>
+      <td>{{user.created_at}}</td>
+      <td> <a href="{{'users/' ~ user.id}}"> <button class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;">update</button></a>
+      <a href="javascript:;" data-request="onDelete" data-request-confirm="Are you sure?" data-request-data="id : {{user.id}}"><button class="btn btn-danger">Delete</button></a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+  </body>
+  </html>

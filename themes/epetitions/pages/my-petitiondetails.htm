@@ -1,0 +1,225 @@
+title = "my-petitiondetails"
+url = "/my-petitiondetails"
+layout = "default"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+
+function onStart() {
+
+try{
+      $userId = Auth::getUser() ? Auth::getUser()->id : 0;
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=user_id:is:'. $userId );
+
+//$this['petitions'] = json_decode($response)->data;
+$petitions = json_decode($response)->data;
+
+$petitions = json_decode($response)->data;
+  usort($petitions, function($a, $b) {
+    return strtotime($b->created_at) - strtotime($a->created_at);
+});
+  
+
+// Add the signature count to each petition
+foreach ($petitions as $petition) {
+  if(!empty($petition->id)){
+  $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/signature-count');
+  //$signature_count = json_decode($response)->count;
+  //$petition->signature_count = $signature_count;
+  
+  $response_data = json_decode($response);
+  if ($response_data && isset($response_data->count)) {
+    $signature_count = $response_data->count;
+    $petition->signature_count = $signature_count;
+  } else {
+    $petition->signature_count = 0;
+  }
+
+
+
+  }
+}
+
+
+
+$this['petitions'] =  $petitions;
+
+
+ }
+    catch(ApplicationException $e) {
+        $this['petitions'] = [];
+    }
+
+
+   
+    
+
+}
+
+
+
+
+
+/*public  function onDelete()
+ {
+     $id = request()->input('id');
+      $response = Http::delete('http://lin-intranet.parliament.gov.za/api/v1/ahmadfatoni/apigeneratorcontroller/data'.$id);
+     // $jsonData = $response->json();
+  $this['petition'] = json_decode($response)->data;
+   
+  return Redirect('/petitionrequest');
+ }
+
+public function onWithdrawal()
+{
+ return Redirect('/withdraw');
+
+}*/
+function onWithdrawal()
+{
+  
+ return Redirect('/withdraw/'.$this->param('id'));
+
+}
+?>
+==
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Petition Request</title>
+  </head>
+  <body>
+<div class="container">
+<br>
+<a  class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;"  href="{{ 'request-petition' |page }}">
+  Request Petition
+</a>
+
+</div>
+<br>
+
+
+
+<table class="table"  >
+  <thead class="story-headline" style="background-color: #Efeade;">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Title</th>
+      <th scope="col">Intended Recipient</th>
+      <th scope="col">Status</th>
+      <th scope="col">Signatures</th>
+      <th scope="col">Task</th>
+      <th scope="col">Action Required</th>
+      <th scope="col">Action</th>
+
+      <td>
+   
+      </td>
+       
+      <td>
+   
+      </td>
+    </tr>
+  </thead>
+  <tbody class="story-headline">
+   
+    
+ 
+     {% for petition in petitions %}  
+    
+    <tr style="word-wrap: break-word;">
+   
+      <th scope="row">{{petition.id}}</th>
+      <td>{{petition.title}}</td>
+      <td>{{petition.intended_to}}</td>
+      <td>{{petition.status.name}}</td>
+      <td>{{ petition.signature_count }}</td>
+      <td>{{petition.comment}}</td>
+      {% if petition.checked is not empty %}
+      <td> <button class="btn btn-default" id="yes-button" style="background-color:#50C878;color:#ffffff;" disabled>Completed </button></td>
+      {% else %}
+      <td> <a href="{{'actionrequired/' ~petition.id}}">{% if petition.comment is not null  %}<button class="btn btn-default" id="yes-button" style="background-color:#50C878;color:#ffffff;">Start </button>{% else %}
+      <button class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;display:none">
+      </button>{% endif %}</a></td>
+     
+      {% endif %}
+      <!--<td><a href="{{'actionrequired/' ~petition.id}}"><button class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;">Yes</button>{{petition.comment}}</a></td>-->
+     
+         {% if petition.reason is empty %}
+      <td>  <a href="{{'updatepetition/'~petition.id}}"><button class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;">update</button></a></td>
+    
+  <td><a href="{{'withdraw/'~petition.id}}"  ><button type="submit" id="withdraw-btn" class="btn btn-danger" name="Exit" onclick="confirmExit()" >Withdraw</button></a></td>
+
+  <script>
+    function confirmExit() {
+        if (confirm("Are you sure you want to withdraw?")) {
+            window.location.href = "{{'withdraw/'~petition.id}}";
+        }
+    }
+    </script>
+
+     {% else %}
+     <td>  <button class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;" disabled>update</button></td>
+     <td ><button type="submit" class="btn btn-danger" disabled>Withdraw</button></td>
+     
+     {% endif %}
+ 
+    </tr>
+    
+    {% endfor %}
+  
+  </tbody>
+</table>
+  </body>
+
+
+  </html>
+ 
+ 
+  <style>
+    .story-headline
+  {
+    padding: 10px;
+    padding-left: 10px;
+    position: relative;
+    font-family: ff-dax-pro, sans-serif;
+    border-bottom: 1px solid #f6f3ec;
+    text-transform: uppercase;
+    letter-spacing: -0.7px;
+    line-height: 1.2;
+    color: #275937;
+
+  }
+
+  .story-headline:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: calc(100% - 4px);
+    left: 0;
+    top: 2px;
+}
+
+a {
+    line-height: inherit;
+    color: #275937;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+
+td, th {
+  padding: 5px; /* optional: add padding to the cells */
+}
+
+  </style>

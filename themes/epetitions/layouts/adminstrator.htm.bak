@@ -1,0 +1,164 @@
+description = "Home page"
+==
+<?php
+use System\Classes\CombineAssets;
+use RoscoeCairney\Parliament\Models\ParliamentSetting;
+
+function onStart() {
+
+  // Load menu array
+  require_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/roscoecairney/ParlyMenu/ParlyMenu.php');
+  $parly_menu = new ParlyMenu;
+  $this['menuStructure'] = $parly_menu->getMenu();
+
+ // Build arrays of CSS and Javascript to inject
+  $cssAssets = [
+    'assets/css/foundation-icons.css',
+    'assets/css/slick.css',
+    'assets/foundation-sites/dist/assets/css/app.css',
+    'assets/css/mine.css',
+    'assets/css/flickity.css',
+    'assets/css/fullcalendar.min.css',
+    'assets/css/jquery.dynatable.css',
+  ];
+
+
+
+
+  $jsAssets = [
+    'assets/js/vendor/jquery-3.4.1.min.js',
+    'assets/js/vendor/slick.min.js',
+    'assets/foundation-sites/dist/assets/js/app.js',
+    'assets/js/vendor/what-input.min.js',
+    'assets/js/vendor/flickity.pkgd.min.js',
+    'assets/js/vendor/moment.min.js',
+    'assets/js/vendor/fullcalendar.min.js',
+    'assets/js/vendor/jquery.dynatable.min.js',
+    'assets/js/vendor/jquery.popupoverlay.js',
+    'assets/js/angular/searchApp.js',
+    'assets/js/angular/searchFactory.js',
+  ];
+
+  
+  
+  switch ($this->page->baseFileName) {
+    case 'product':
+      array_push($cssAssets,
+        'assets/css/image_rotator.css'
+      );
+      array_push($jsAssets,
+        'assets/js/image_rotator.js'
+      );
+      break;
+  }
+
+
+
+  $theme_path = $_SERVER["DOCUMENT_ROOT"] . '/themes/' . Config::get("cms.activeTheme",'');
+  array_push($jsAssets,
+
+    'assets/js/all.js',
+    'assets/js/vendor/google-analytics.js'
+  );
+
+  $thisPageJs = $theme_path . '/assets/js/' . $this->page->baseFileName . '.js';
+  if (file_exists($thisPageJs)) {
+    array_push($jsAssets,
+      'assets/js/' . $this->page->baseFileName . '.js'
+    );
+  }
+
+  //code added to load turn(e-book) libraries for publication-details
+  if ($this->page->baseFileName == 'publication-details') {
+    array_push($jsAssets,
+      'assets/js/vendor/turn.min.js',
+      'assets/js/vendor/zoom.min.js'
+    );
+  }
+
+  $jsAssets = array_map(function ($asset) use ($theme_path) { return substr($theme_path . '/' . $asset, 1); }, $jsAssets);
+  $cssAssets = array_map(function ($asset) use ($theme_path) { return substr($theme_path . '/' . $asset, 1); }, $cssAssets);
+
+  $this->addJs('assets/js/vendor/angular.min.js');
+  
+ //echo "<PRE>";
+ //var_dump($jsAssets);
+ //echo "</PRE>";
+ 
+//foreach ($jsAssets as $jsAsset) {
+//      $this->addJs(str_replace('mnt/web/html/themes/parliament/', 'https://www.parliament.gov.za/themes/parliament/', $jsAsset));
+//}
+//foreach ($cssAssets as $cssAsset) {
+//      $this->addCss(str_replace('mnt/web/html/themes/parliament/', 'https://www.parliament.gov.za/themes/parliament/', $cssAsset));
+//}  
+  
+  
+  $this->addJs(CombineAssets::combine($jsAssets, $this->assetPath));
+  $this->addCss(CombineAssets::combine($cssAssets, $this->assetPath));
+
+/*
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/jquery-3.4.1.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/slick.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/foundation-sites/dist/assets/js/app.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/what-input.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/flickity.pkgd.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/moment.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/fullcalendar.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/jquery.dynatable.min.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/vendor/jquery.popupoverlay.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/angular/searchApp.js');
+    $this->addJs('https://www.parliament.gov.za/themes/parliament/assets/js/angular/searchFactory.js');
+*/
+
+  $this['parliament_sitting'] = ParliamentSetting::get('parliament_sitting');
+
+}
+?>
+==
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        {% partial "ga_tracking" %}
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="google-site-verification" content="ISidyHsMS-o1xyhaNU9H2DMDnOzesK0sNjjjW8QQGQs" />
+        <title>{{ this.page.title }} - Parliament of South Africa</title>
+        {% styles %}
+        <script type="text/javascript" src="/themes/parliament/assets/js/vendor/pace.js"></script>
+    </head>
+    <body class="page-{{ this.page.id }}">
+
+      <div class="off-canvas-wrapper">
+        <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+
+          <!-- This contains the off canvas left hand side navigation -->
+          <div class="off-canvas position-left" id="offCanvas" data-off-canvas>
+            {% partial "main-menu" menuType='vertical' %}
+          </div>
+
+          <!-- All on canvas content goes here -->
+          <div class="off-canvas-content" data-off-canvas-content>
+
+            <!-- desktop-nav -->
+            {% partial "desktop-nav" %}
+
+            <!-- Page content goes here -->
+
+            <div id="pageContent" class="grid-container">{% page %}</div>
+
+            <!-- Footer -->
+            {% partial "footer" %}
+
+          </div>
+        </div>
+      </div>
+
+      {% scripts %}
+      {% framework %}
+      {% partial "dev-assets" %}
+      {% partial "home-page-overlay" %}
+      {% partial "dcmi" %}
+      <!-- <script type="text/javascript" src="http://localhost:35729/livereload.js"></script> -->
+    </body>
+</html>

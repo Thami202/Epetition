@@ -1,0 +1,161 @@
+url = "/updatepetition/:id"
+layout = "default"
+title = "update petition"
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+
+
+function onStart() {
+
+try{
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id'));
+
+$this['apigeneratorcontroller'] = json_decode($response);
+
+ }
+    catch(ApplicationException $e) {
+        $this['apigeneratorcontroller'] = [];
+    }
+    
+}
+
+public function onUpdate()
+{
+    try {
+        
+          
+        if(Input::hasFile('doc_type')) {
+            $filename = Input::file('doc_type')->getClientOriginalName();
+            $filepath = Input::file('doc_type')->storeAs('uploads/public', $filename);            
+            $fileHandle = (new System\Models\File)->fromData(Storage::get($filepath), $filename);
+        }
+        else {
+            $fileHandle = null;
+           // var_dump($fileHandle);
+        }
+
+        $response = Http::put("http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/".$this->param('id'), function($http) use($fileHandle) {
+            $http->data([
+    'id' =>Auth::getUser()->id,
+    'title' =>Input::get('title'),
+    'intended_to' => Input::get('intended_to'),
+    'description' =>Input::get('description'),
+    'file' => $fileHandle != null ? [
+    'name' => $fileHandle->file_name,
+    'url' => $fileHandle->getPath()
+] : null,
+
+                
+            ]);
+        });
+        
+    
+
+
+
+     if($response->code == 200)
+        {
+            //var_dump($f);
+          // var_dump('testing: ' . $response->body);
+        return redirect('/dashboard');
+        
+        }else {
+           var_dump('Something went wrong: ' . $response->body);
+           // return Redirect::back()->withInput(); // ('/request-petition');
+            
+             return  redirect('/updatepetition/'.$this->param('id'));
+        } 
+    }
+    catch(ApplicationException $e) {
+        var_dump($e->getMessage());
+        return Redirect::back()->withInput();
+    }
+    
+ }
+?>
+==
+<section id="portfolio" class="portfolio">
+    
+     <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+                  
+                        <form data-request="onUpdate" id="login-form" class="form"">
+                        {{ form_token()}}
+                        {{ form_sessionKey()}}
+
+                            <h2  >Update Petition</h2>
+
+                          
+                            <div class="form-group">
+                                
+                                <label for="title" style="font-size: 18px;" >Title</label><br>
+                               <input type="text" name="title" class="form-control" Placeholder="subject of the petition" value="{{ apigeneratorcontroller.title }}"  required/>
+                              
+                            </div>
+                          <div class="form-group">
+                                <label for="intented_to" style="font-size: 18px;" >Intended To</label><br>
+                               <input type="text" name="intended_to" class="form-control" Placeholder="NA/NCOP/Committees" value="{{apigeneratorcontroller.intended_to  }}" required/>
+                              
+                            </div>
+
+                            <div class="form-group">
+                            <label for="textAreaField" style="font-size: 18px;" >Description</label><br> 
+                        <textarea name="description" class="form-control" id="textAreaField" rows="8"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition" >{{apigeneratorcontroller.description}}</textarea> 
+                        </div>
+                        <div class="form-group">
+                            <input type="file" class="form-control" name="doc_type" />
+                            </div>
+
+
+                            <div class="form-group" >
+                                <br>
+                                <button type="submit" style="background-color:#9e7c0c;color:#ffffff;" name="Create" class="accountButton" ><img  style="height:22px;" src="{{ 'assets/images/update.png'|theme }}"/>
+                                    <span style="font-size: 16px;">Lodge Update</span></button>
+                                
+                        </form>
+                      
+                    </div>
+                     
+            </div>
+        </div>
+      <div class="container">
+
+         <div class="row portfolio-container">
+             </div>         
+      </div>
+    </section>
+        <style>
+      .accountButton {
+         border: none;
+         border-radius: 0px;
+         color: whitesmoke;
+         height: 40px;
+         width: 250px;
+         background-color: #9e7c0c !important;
+         color: white !important;
+         padding-left: 40px !important;
+         text-align: left !important;
+         margin: 10px;
+         padding-top: 3px;
+         border-radius: 20px;
+         background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+     }
+     
+     button {
+         background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+         background-color: #9e7c0c !important;
+         color: white;
+         border-radius: 20px;
+         border: none;
+         height: 40px;
+     }
+     
+     
+       </style>

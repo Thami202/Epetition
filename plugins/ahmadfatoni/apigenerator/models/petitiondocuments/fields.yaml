@@ -1,0 +1,20 @@
+fields:
+    petition_id:
+        label: Status
+        span: auto
+        showSearch: true
+        type: dropdown
+tabs:
+    fields:
+        documents:
+            label: Attachments
+            span: full
+            mode: file
+            useCaption: true
+            thumbOptions:
+                mode: crop
+                extension: auto
+            type: fileupload
+            tab: Attachments
+        
+       

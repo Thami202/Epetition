@@ -1,0 +1,11 @@
+name: SignatureController
+form: $/ahmadfatoni/apigenerator/models/signature/fields.yaml
+modelClass: AhmadFatoni\ApiGenerator\Models\Signature
+defaultRedirect: ahmadfatoni/apigenerator/signaturecontroller
+create:
+    redirect: 'ahmadfatoni/apigenerator/signaturecontroller/update/:id'
+    redirectClose: ahmadfatoni/apigenerator/signaturecontroller
+update:
+    redirect: ahmadfatoni/apigenerator/signaturecontroller
+    redirectClose: ahmadfatoni/apigenerator/signaturecontroller
+

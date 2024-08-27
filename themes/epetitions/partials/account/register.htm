@@ -1,0 +1,520 @@
+{% if canRegister %}
+<h3>Register</h3>
+
+{{ form_ajax('onRegister') }}
+
+<div class="form-group">
+    <label for="registerName" style="font-size: 18px;">Full Name</label>
+    <input name="name" type="text" class="form-control" id="registerName" placeholder="Enter your full name" required />
+</div>
+
+
+<div class="form-group">
+    <label for="registerID" style="font-size: 18px;">ID Number</label>
+    <input name="id_number" type="text" class="form-control"    id="registerID" placeholder="Enter ID Number" maxLength="13" required oninput="validateIDNumber(this)"/>
+</div>
+
+
+
+
+<div class="form-group">
+    <label for="registerPhoneNumber" style="font-size: 18px;">Phone Number</label>
+    <input name="phone_number" type="text" class="form-control" id="registerPhoneNumber"
+        placeholder="Enter Phone Number" maxlength="10" required oninput="validatePhoneNumber(this)"/>
+</div>
+
+
+
+<div class="form-group">
+  <label for="registerProvince" style="font-size: 18px;">Province</label><br>
+  <select id="province" name="province" class="form-control" onchange="updateMunicipalities()">
+      <option value="">Select...</option>
+      <option value="Eastern Cape">Eastern Cape</option>
+      <option value="Free State">Free State</option>
+      <option value="Gauteng">Gauteng</option>
+      <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+      <option value="Limpopo">Limpopo</option>
+      <option value="Mpumalanga">Mpumalanga</option>
+      <option value="Northern Cape">Northern Cape</option>
+      <option value="North West">North West</option>
+      <option value="Western Cape">Western Cape</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label for="registerMunicipality" style="font-size: 18px;">Municipality</label>
+  <select id="municipality" name="municipality" class="form-control">
+      <option value="">Select...</option>
+  </select>
+</div>
+
+
+
+
+{% if loginAttribute == "username" %}
+<div class="form-group">
+    <label for="registerUsername" style="font-size: 18px;">Username</label>
+    <input name="username" type="text" class="form-control" id="registerUsername" placeholder="Enter your username" />
+</div>
+{% endif %}
+
+<div class="form-group">
+    <label for="registerEmail" style="font-size: 18px;">Email</label>
+    <input name="email" type="email" class="form-control" id="registerEmail" placeholder="Enter your email" />
+</div>
+
+<div class="form-group">
+    <label for="registerPassword" style="font-size: 18px;">Password</label>
+    <input name="password" type="password" class="form-control" id="registerPassword" placeholder="Choose a password" />
+</div>
+
+
+
+<button type="submit"  style="background-color:#9e7c0c;color:#ffffff" class="accountButton "><img  style="height:22px;" src="{{ 'assets/images/registration.png'|theme }}" />
+    <span style="font-size: 16px;">Register</span></button>
+<br>
+<br>
+{{ form_close() }}
+{% else %}
+<!-- Registration is disabled. -->
+{% endif %}
+
+<script>
+function validateIDNumber(input) {
+    var idNumber = input.value;
+    if (!/^\d{13}$/.test(idNumber)) {
+        // Invalid ID number, clear input value
+        input.setCustomValidity('ID number must be exactly 13 digits long and contain numbers only.');
+        return;
+    }
+    var year = parseInt(idNumber.substr(0, 2), 10);
+    var month = parseInt(idNumber.substr(2, 2), 10);
+    var day = parseInt(idNumber.substr(4, 2), 10);
+    if (year < 0 || year > 99 || month < 1 || month > 12 || day < 1 || day > 31) {
+        // Invalid ID number, clear input value
+        input.setCustomValidity('Please enter a valid South African ID number.');
+        return;
+    }
+    // Valid ID number, clear any validation error
+    input.setCustomValidity('');
+}
+
+
+</script>
+
+
+<script>
+function validatePhoneNumber(input) {
+    var phoneNumber = input.value;
+    // Remove any non-numeric characters from the input
+    phoneNumber = phoneNumber.replace(/\D/g, '');
+    // Check if the phone number is exactly 10 digits long
+    if (!/^\d{10}$/.test(phoneNumber)) {
+        // Invalid phone number, clear input value
+        input.setCustomValidity('Phone number must be exactly 10 digits long and contain numbers only.');
+        return;
+    }
+    // Valid phone number, clear any validation error
+    input.setCustomValidity('');
+}
+
+
+
+</script>
+
+<script>
+  function updateMunicipalities() {
+      const provinceSelect = document.getElementById("province");
+      const municipalitySelect = document.getElementById("municipality");
+
+      // Clear existing options
+      municipalitySelect.innerHTML = '<option value="">Select...</option>';
+
+      // Populate options based on selected province
+      if (provinceSelect.value === "Eastern Cape") {
+          const municipalities = [
+                           
+      "Buffalo City Metropolitan",
+      "Nelson Mandela Bay Metropolitan",
+      "Matatiele Local",
+      "Ntabankulu Local",
+      "Umzimvubu Local",
+      "Winnie Madikizela-Mandela Local",
+      "Amahlathi Local",
+      "Great Kei Local",
+      "Mbhashe Local",
+      "Mnquma Local",
+      "Ngqushwa Local",
+      "Raymond Mhlaba Local",
+      "Dr AB Xuma Local",
+      "Emalahleni Local",
+      "Enoch Mgijima Local",
+      "Intsika Yethu Local",
+      "Inxuba Yethemba Local",
+      "Sakhisizwe Local",
+      "Elundini Local",
+      "Senqu Local",
+      "Walter Sisulu Local",
+      "Ingquza Hill Local",
+      "King Sabata Dalindyebo Local",
+     "Mhlontlo Local",
+      "Nyandeni Local",
+      "Port St Johns Local",
+      "Blue Crane Route Local",
+      "Dr Beyers Naudé Local",
+       "Kouga Local",
+       "Koukamma Local",
+      "Makana Local",
+      "Ndlambe Local",
+      "Sundays River Valley Local",
+
+
+
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+      } 
+    
+    else  if (provinceSelect.value === "Free State") {
+          const municipalities = [
+                           
+      "Mafube Local",
+      "Metsimaholo Local",
+      "Moqhaka Local",
+      "Ngwathe Local",
+      "Masilonyana Local",
+      "Matjhabeng Local",
+      "Nala Local",
+      "Tokologo Local",
+      "Tswelopele Local",
+      "Dihlabeng Local",
+      "Maluti-A-Phofung Local",
+      "Mantsopa Local",
+      "Nketoana Local",
+      "Phumelela Local",
+      "Setsoto Local",
+      "Kopanong Local",
+      "Letsemeng Local",
+      "Mohokare Local",
+
+
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+      } else if(provinceSelect.value === "Gauteng"){
+          const municipalities = [
+              "City of Ekurhuleni Metropolitan",
+              "City of Johannesburg Metropolitan",
+              "City of Tshwane Metropolitan",
+              "Emfuleni Local",
+              "Lesedi Local",
+              "Midvaal Local",
+              "Merafong City Local",
+              "Mogale City Local",
+              "Rand West City Local"
+              // Add more options here
+          ];
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      } else if(provinceSelect.value === "KwaZulu-Natal"){
+          const municipalities = [
+              "eThekwini Metropolitan",
+              "Dannhauser Local",
+              "eMadlangeni Local",
+              "Newcastle Local",
+              "Dr Nkosazana Dlamini Zuma Local",
+              "Greater Kokstad Local",
+              "Ubuhlebezwe Local",
+              "Umzimkhulu Local",
+              "KwaDukuza Local",
+              "Mandeni Local",
+              "Maphumulo Local",
+              "Ndwedwe Local",
+              "City of uMhlathuze Local",
+              "Mthonjaneni Local",
+              "Nkandla Local",
+              "uMfolozi Local",
+              "uMlalazi Local",
+              "Ray Nkonyeni Local",
+              "Umdoni Local",
+              "Umuziwabantu Local",
+              "Umzumbe Local",
+              "Impendle Local",
+              "Mkhambathini Local",
+              "Mpofana Local",
+              "Msunduzi Local",
+              "Richmond Local",
+              "uMngeni Local",
+              "uMshwathi Local",
+              "Big 5 Hlabisa Local",
+              "Jozini Local",
+              "Mtubatuba Local",
+              "uMhlabuyalingana Local",
+              "Endumeni Local",
+              "Nquthu Local",
+              "uMsinga Local",
+              "Umvoti Local",
+              "Alfred Duma Local",
+              "Inkosi Langalibalele Local",
+              "Okhahlamba Local",
+              "AbaQulusi Local",
+              "eDumbe Local",
+              "Nongoma Local",
+              "Ulundi Local",
+              "uPhongolo Local"
+             
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      } else if(provinceSelect.value === "Limpopo"){
+          const municipalities = [
+              "Blouberg Local",
+              "Lepelle-Nkumpi Local",
+              "Molemole Local",
+              "Polokwane Local",
+              "Ba-Phalaborwa Local",
+              "Greater Giyani Local",
+              "Greater Letaba Local",
+              "Greater Tzaneen Local",
+              "Maruleng Local",
+              "Elias Motsoaledi Local",
+              "Ephraim Mogale Local",
+              "Fetakgomo Tubatse Local",
+              "Makhuduthamaga Local",
+              "Collins Chabane Local",
+              "Makhado Local",
+              "Musina Local",
+              "Thulamela Local",
+              "Bela-Bela Local",
+              "Lephalale Local",
+              "Modimolle-Mookgophong Local",
+              "Mogalakwena Local",
+              "Thabazimbi Local"
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      } else if(provinceSelect.value === "Mpumalanga"){
+          const municipalities = [
+              "Bushbuckridge Local",
+              "City of Mbombela Local",
+              "Nkomazi Local",
+              "Thaba Chweu Local",
+              "Chief Albert Luthuli Local",
+              "Dipaleseng Local",
+              "Dr Pixley Ka Isaka Seme Local",
+              "Govan Mbeki Local",
+              "Lekwa Local",
+              "Mkhondo Local",
+              "Msukaligwa Local",
+              "Dr JS Moroka Local",
+              "Emakhazeni Local",
+              "Emalahleni Local",
+              "Steve Tshwete Local",
+              "Thembisile Hani Local",
+              "Victor Khanye Local"
+              
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      }
+ else if(provinceSelect.value === "Northern Cape"){
+          const municipalities = [
+              "Dikgatlong Local",
+              "Magareng Local",
+              "Phokwane Local",
+              "Sol Plaatje Local",
+              "Ga-Segonyana Local",
+              "Gamagara Local",
+              "Joe Morolong Local",
+              "Hantam Local",
+              "Kamiesberg Local",
+              "Karoo Hoogland Local",
+              "Khai-Ma Local",
+              "Nama Khoi Local",
+              "Richtersveld Local",
+              "Emthanjeni Local",
+              "Kareeberg Local",
+              "Renosterberg Local",
+              "Siyancuma Local",
+              "Siyathemba Local",
+              "Thembelihle Local",
+              "Ubuntu Local",
+              "Umsobomvu Local",
+              "!Kheis Local",
+              "Dawid Kruiper Local",
+              "Kai !Garib Local",
+              "Kgatelopele Local",
+              "Tsantsabane Local",
+
+
+
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      }
+      else if(provinceSelect.value === "North West"){
+          const municipalities = [
+              "Kgetlengrivier Local",
+              "Madibeng Local",
+              "Moretele Local",
+              "Moses Kotane Local",
+              "Rustenburg Local",
+              "City of Matlosana Local",
+              "JB Marks Local",
+              "Maquassi Hills Local",
+              "Greater Taung Local",
+              "Kagisano-Molopo Local",
+              "Lekwa-Teemane Local",
+              "Mamusa Local",
+              "Naledi Local",
+              "Ditsobotla Local",
+              "Mahikeng Local",
+              "Ramotshere Moiloa Local",
+              "Ratlou Local",
+              "Tswaing Local",
+              
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      }else if(provinceSelect.value === "Western Cape"){
+          const municipalities = [
+              "City of Cape Town Metropolitan",
+              "Breede Valley Local",
+              "Drakenstein Local",
+              "Langeberg Local",
+              "Stellenbosch Local",
+              "Witzenberg Local",
+              "Beaufort West Local",
+              "Laingsburg Local",
+              "Prince Albert Local",
+              "Bitou Local",
+              "George Local",
+              "Hessequa Local",
+              "Kannaland Local",
+              "Knysna Local",
+              "Mossel Bay Local",
+              "Oudtshoorn Local",
+              "Cape Agulhas Local",
+              "Overstrand Local",
+              "Swellendam Local",
+              "Theewaterskloof Local",
+              "Bergrivier Local",
+              "Cederberg Local",
+              "Matzikama Local",
+              "Saldanha Bay Local",
+              "Swartland Local"
+              
+              // Add more options here
+          ];
+
+          municipalities.forEach(municipality => {
+              const option = document.createElement("option");
+              option.text = municipality;
+              option.value = municipality;
+              municipalitySelect.add(option);
+          });
+
+      }
+  }
+</script>
+
+
+
+<script>
+function isNumeric(input) {
+return /^[0-9]+$/.test(input);
+}
+
+const inputField = document.getElementById("id_number");
+
+
+inputField.addEventListener("blur", function(event) {
+const input = event.target.value;
+if (!isNumeric(input)) {
+  alert("Please enter a valid numeric value.");
+  inputField.value = ""; // Clear the input field
+  
+}
+});
+</script>
+<style>
+.accountButton {
+    border: none;
+    border-radius: 0px;
+    color: whitesmoke;
+    height: 40px;
+    width: 250px;
+    background-color: #9e7c0c !important;
+    color: white !important;
+    padding-left: 40px !important;
+    text-align: left !important;
+    margin: 10px;
+    padding-top: 3px;
+    border-radius: 20px;
+    background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+}
+
+button {
+    background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+    background-color: #9e7c0c !important;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    height: 40px;
+}
+
+
+</style>
+

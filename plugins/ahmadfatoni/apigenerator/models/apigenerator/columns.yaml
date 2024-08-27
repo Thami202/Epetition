@@ -1,0 +1,30 @@
+columns:
+    id:
+        label: id
+        type: number
+    title:
+        label: title
+        type: text
+    description:
+        label: description 
+        type:  text
+    intended_to:
+        label: intended_to 
+        type:  text       
+    status_id:
+        label: status
+        type: number
+    user_id:
+        label: Petitioner
+        type: number
+   
+    created_at:
+        label: created_at
+        type: datetime
+
+    reason:
+        label: reason
+        type: text 
+    comment:
+        label: comment
+        type: text          

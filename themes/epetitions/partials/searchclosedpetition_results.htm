@@ -1,0 +1,11 @@
+description = "This is a closed petition results"
+==
+{% if petitions is empty %}
+    No results found
+{% else %}
+    <ul>
+        {% for petition in petitions %}
+        <a href="{{'detailpetition/'~petition.id}}">{{petition.title}}</a>
+        {% endfor %}
+    </ul>
+{% endif %}

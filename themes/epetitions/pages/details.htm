@@ -1,0 +1,362 @@
+title = "Petition Details"
+url = "/petition/:id/"
+layout = "default"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+use Illuminate\Support\MessageBag;
+
+function onStart() {
+      $this->addJs('assets/mine/a076d05399.js');
+    // $this->addCss('assets/mine/font-awesome.min.css');
+    // $this->addJs('assets/javascript/fontawesome.min.js');
+    try {
+        // Retrieve the petition with the specified ID
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id'));
+        $petition = json_decode($response);
+
+        // Retrieve the signature count for the selected petition
+        if (!empty($petition->id)) {
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/signature-count');
+        $signature_count = json_decode($response)->count;
+
+        // Add the signature count to the petition
+        $petition->signature_count = $signature_count;
+}
+        $this['petition'] = $petition;
+        $this['signatures'] = [];
+    } catch (ApplicationException $e) {
+        $this['petition'] = null;
+        $this['signatures'] = [];
+    }
+}
+
+
+
+
+function onSignForm()
+{
+  
+
+
+   return [
+
+       '#workpspace' =>$this->renderPartial('petitions/sign-form')
+   ];
+
+}
+
+function onSign()
+{
+    try {
+        // Retrieve list of signatures for the current petition
+        // Check if user has already signed the petition
+        $userEmail = Input::get('email'); // Assumes the email is submitted in the input form
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id').'/signatures?email='.$userEmail);
+        $signatures = json_decode($response)->data;
+
+        
+       // $hasSigned = collect($signatures)->contains('email', $userEmail);
+        $hasSigned = collect($signatures)->contains(function($value) use ($userEmail) {
+    return $value->email === $userEmail && $value->petition_id == $this->param('id');
+});
+
+
+        if ($hasSigned) {
+             $errors = new MessageBag(['message' => 'You have already signed the petition.']);
+             return redirect()->back()->withErrors($errors);
+        }
+
+        // Sign the petition
+        $response = Http::post('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id').'/signatures', function($http)  {
+            $http->data([
+                'petition_id' => $this->param('id'),
+                'name' => Input::get('name'),
+                'surname' => Input::get('surname'),
+                'email' => Input::get('email'),
+                'organisation' => Input::get('organisation'),
+            ]);
+        });
+
+        if ($response->code === 201) {
+            return redirect('/openpetition');
+        } else {
+            $errors = new MessageBag(['message' => 'Failed to sign the petition.']);
+            return redirect()->back()->withErrors($errors);
+        }
+    } catch (ApplicationException $e) {
+        // Handle exception
+        $errors = new MessageBag(['message' => 'An error occurred. Please try again later.']);
+        return redirect()->back()->withErrors($errors);
+    }
+}
+
+
+
+/*function onSign()
+{
+    
+   try {
+       
+        // Retrieve list of signatures for the current petition
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id').'/signatures');
+        $signatures = json_decode($response)->data;
+
+        // Check if user has already signed the petition
+        $userEmail = Input::get('email'); // Assumes the email is submitted in the input form
+        $hasSigned = collect($signatures)->contains('email', $userEmail);
+
+        if ($hasSigned) {
+             $errors = new MessageBag(['message' => 'You have already signed the petition.']);
+             return redirect()->back()->withErrors($errors);
+        }
+
+   
+       
+    
+    $response = Http::post('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id').'/signatures', function($http)  {
+            $http->data([
+  
+    'petition_id' =>$this->param('id'),
+    'name' =>Input::get('name'),
+   'surname' =>Input::get('surname'),
+    'email' =>Input::get('email'),
+     'organisation' =>Input::get('organisation'),
+]);
+});
+
+ \Log::info('First'.$response->body);
+
+if($response->code===201)
+{
+     \Log::info('Successful'.$response->body);
+   return  redirect('/openpetition');
+    
+}else{
+ 
+ $errors = new MessageBag(['message' => 'Failed to sign the petition.']);
+            return redirect()->back()->withErrors($errors)
+}
+
+ }
+    catch(ApplicationException $e) {
+       $errors = new MessageBag(['message' => 'An error occurred. Please try again later.']);
+        return redirect()->back()->withErrors($errors);
+    }
+ 
+}*/
+?>
+==
+<main id="content" role="main">
+  
+<br>
+    <span class="heading-secondary"><h2 class="header"> {{petition.title}}</h2></span>
+   
+    <!--<div><p>
+    {{petition.description}}
+  </p></div>-->
+
+  <!--<div><p>The Government needs to bring back the death penalty by lethal injection for those convicted of rape, child sexual abuse, or murder. It has been far too long that children have been tortured and become victims of sexual abuse, with overly lenient punishment.</p></div>-->
+    <details>
+      <summary><span class="summary">More details</span></summary>
+      <div><p>{{petition.description}}</p></div>
+    </details>
+    
+<h3><a class="button button-sign-petition" href="#" data-request="onSignForm">Sign this Petition</a></h3>
+{% if errors.isNotEmpty() %}
+    <div class="alert alert-danger">
+        {% for error in errors.get('message') %}
+            {{ error }}
+        {% endfor %}
+    </div>
+{% endif %}
+   <div id="workpspace"> </div>
+    <!--<a class="button button-sign-petition" href="/petitions/618680/signatures/new">Sign this petition</a>-->
+
+  <div class="signature-count">
+  <p class="signature-count-number">
+    <span class="count" id="signature-count" data-count="{{ petition.signature_count }}">{{ petition.signature_count }}</span>
+    <span class="text">signatures</span>
+  </p>
+  <div class="signature-count-graph" aria-hidden="true">
+    <span class="signature-count-current" style="width:{{ petition.signature_count / 10 * 100 }}%"></span> 
+  </div>
+</div>
+<p class="signature-count-goal">10</p>
+
+
+  <div class="about-petitions">
+    <section class="about-item about-item-count-response" id="response-threshold" aria-labelledby="response-threshold-heading">
+      <h2 id="response-threshold-heading">At 10,000 signatures...</h2>
+      <p>At 10,000 signatures, government will respond to this petition</p>
+</section>
+
+    <section class="about-item about-item-count-debate" id="debate-threshold" aria-labelledby="debate-threshold-heading">
+      <h2 id="debate-threshold-heading">At 100,000 signatures...</h2>
+      <p>At 100,000 signatures, this petition will be considered for debate in&nbsp;Parliament</p>
+</section>
+
+</div>
+
+  
+<h2>Share this petition</h2>
+<div style="text-align: left;">
+  <h4>
+
+    <a href="{{'https://www.facebook.com/sharer/sharer.php?u=http://lin-intranet.parliament.gov.za/petition/'~petition.id}}" target="_blank" style="margin-right: 10px;">Facebook<i class="fab fa-facebook fa-2x"></i></a>
+    
+    <!--<a href="{{'https://www.linkedin.com/sharing/share-offsite/?url=http://lin-intranet.parliament.gov.za/petition/'~petition.id}}" target="_blank" style="margin-right: 10px;">Linkedin<i class="fab fa-linkedin fa-2x"></i></a>-->
+    
+
+    <a href="{{'mailto:?subject=Petition&body=http://lin-intranet.parliament.gov.za/petition/'~petition.id}}" target="_blank" style="margin-right: 10px;">Email<i class="far fa-envelope fa-2x"></i></a>
+    
+    <a href="{{'https://twitter.com/intent/tweet?url=http://lin-intranet.parliament.gov.za/petition/'~petition.id}}" target="_blank" style="margin-right: 10px;">Twitter<i class="fab fa-twitter fa-2x"></i></a>
+ 
+
+    
+  </h4>
+</div>
+<h2><p> Deadline <p></h2>
+<h4><p> 21 January 2023 <p></h4>
+  <span class="note">All petitions run for 6 months</span>
+  
+<br>
+
+
+
+
+<script>
+  // get the signature count and goal elements
+  const signatureCountElement = document.getElementById("signature-count");
+  const goalElement = document.querySelector(".signature-count-goal");
+
+  // get the current signature count and goal
+  let signatureCount1 = parseInt(signatureCountElement.dataset.count);
+  const goal = parseInt(goalElement.textContent);
+
+  // check if the goal has been reached
+  if (signatureCount1 >= goal) {
+    // disable the sign petition button
+    const signPetitionButton = document.querySelector(".button-sign-petition");
+    signPetitionButton.disabled = true;
+    signPetitionButton.textContent = "Goal reached!";
+  }
+
+  // get the sign petition button element
+  const signPetitionButton = document.querySelector(".button-sign-petition");
+
+  // add an event listener to the sign petition button
+  signPetitionButton.addEventListener("click", function(event) {
+    // check if the goal has been reached
+    if (signatureCount1 >= goal) {
+      // prevent the form from opening
+      event.preventDefault();
+      alert("The goal has already been reached. Thank you for your support!");
+      return false;
+    }
+  });
+</script>
+
+<script>
+  // Get the signature count element
+  const signatureCount = document.getElementById('signature-count');
+  
+  // Get the signature count goal element
+  const signatureCountGoal = document.querySelector('.signature-count-goal');
+  
+  // Get the signature count graph current element
+  const signatureCountCurrent = document.querySelector('.signature-count-graph .signature-count-current');
+
+  // Get the signature count goal value
+  const signatureCountGoalValue = Number(signatureCountGoal.textContent.trim());
+
+  // Update the signature count graph based on the current signature count
+  function updateSignatureCountGraph() {
+  const signatureCountValue = Number(signatureCount.dataset.count);
+
+  // Calculate the percentage of signatures obtained
+  const percentage = signatureCountValue === 0 ? 0 : (signatureCountValue / signatureCountGoalValue) * 100;
+
+  // Set the width of the signature count graph current element
+  signatureCountCurrent.style.width = `${percentage}%`;
+}
+
+
+  // Update the signature count graph on page load
+  updateSignatureCountGraph();
+
+  // Update the signature count graph every time the signature count changes
+  signatureCount.addEventListener('DOMSubtreeModified', updateSignatureCountGraph);
+  
+  
+  signatureCount.addEventListener('DOMSubtreeModified', function() {
+  updateSignatureCountGraph();
+});
+
+</script>
+
+<!--<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>-->
+  
+  <style>
+  
+  i.fab.fa-facebook {
+  width: 30px;
+  height: 30px;
+}
+.far{
+    color:#275937;
+}
+
+.fab{
+  color:#275937;
+}
+  
+
+  .header
+  {
+       
+    line-height: 1.4;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    text-transform: uppercase;
+  }
+  
+  details summary {
+  color:  #337ab7;
+}
+.button{
+  color:  #337ab7;
+  
+}
+
+.signature-count-graph .signature-count-current {
+  min-width: 10px;
+}
+
+
+.signature-count .signature-count-graph .signature-count-current {
+  display: block;
+  height: 10px;
+  background-color: #080;
+}
+.signature-count-goal {
+  width: 30%;
+  float: right;
+  text-align: right;
+  color: #6f777b;
+}
+.signature-count .signature-count-graph {
+  clear: both;
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background-color: #bfc1c3;
+  padding: 0;
+}
+  </style>

@@ -1,0 +1,78 @@
+[viewBag]
+==
+<br>
+
+<section id="portfolio" class="portfolio">
+    <!--data-request="{{_SELF_}}::"-->
+     <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+
+               <form data-request="onSign" id="login-form" class="form"">
+
+                {{ form_token()}}
+                {{ form_sessionKey()}}
+                            <h3 style="color:black;" class="text-center text-info">Sign Petition</h3>
+                <div class="form-group">
+                 <label for="userName" style="font-size: 18px;">Name</label>
+                  <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                 <label for="userSurname" style="font-size: 18px;">Surname</label>
+                  <input type="text" name="surname" class="form-control" id="Surname" placeholder="Your Surname" required>
+                </div>
+             
+              <div class="form-group">
+               <label for="userRestoreEmail" style="font-size: 18px;">Email</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
+              </div>
+              <div class="form-group">
+               <label for="userOrganisation" style="font-size: 18px;">Organisation</label>
+                <input type="text" class="form-control" name="organisation" id="organisation" placeholder="Organisation" >
+              </div>
+             
+              <div class="form-group">
+              <button type="submit"  id="sign-button" style="background-color:#9e7c0c;color:#ffffff;" name="Create" class="accountButton" ><img  style="height:22px;" src="{{ 'assets/images/petition.png'|theme }}"/>
+                <span style="font-size: 16px;">Submit</span></button>
+              
+              
+              </div>
+            </form>
+           
+          </div>
+            </div>
+        </div>
+      <div class="container">
+
+         <div class="row portfolio-container">
+             </div>         
+      </div>
+    </section>
+    <style>
+      .accountButton {
+         border: none;
+         border-radius: 0px;
+         color: whitesmoke;
+         height: 40px;
+         width: 250px;
+         background-color: #9e7c0c !important;
+         color: white !important;
+         padding-left: 40px !important;
+         text-align: left !important;
+         margin: 10px;
+         padding-top: 3px;
+         border-radius: 20px;
+         background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+     }
+     
+     button {
+         background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+         background-color: #9e7c0c !important;
+         color: white;
+         border-radius: 20px;
+         border: none;
+         height: 40px;
+     }
+     
+     
+       </style>

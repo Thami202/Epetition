@@ -1,0 +1,12 @@
+#==================================
+# Relation Config
+#==================================
+
+profile:
+  label: Profile
+  manage:
+    form: $/AhmadFatoni/ApiGenerator/models/profile/fields.yaml
+    list: $/AhmadFatoni/ApiGenerator/models/profile/columns.yaml
+  view:
+    list: $/AhmadFatoni/ApiGenerator/models/profile/columns.yaml
+    toolbarButtons: create|delete

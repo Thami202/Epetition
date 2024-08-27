@@ -1,0 +1,43 @@
+title = "exampleofopenpetition"
+layout = "default"
+url = "/exampleofopenpetition/:id/"
+==
+<?php
+use Illuminate\Support\Facades\Http;
+
+function onStart() {
+
+try{
+$response = Http::get('http://lin-intranet.parliament.gov.za/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id'));
+
+$this['apigeneratorcontroller'] = json_decode($response)->data;
+
+ }
+    catch(ApplicationException $e) {
+        $this['apigeneratorcontroller'] = [];
+    }
+    
+
+}
+
+function onSignForm()
+{
+    return[
+  '#workspace1' =>$this->renderPartial('petitions/sign-form')
+    ];
+}
+?>
+==
+<ul>
+
+Title:{{apigeneratorcontroller.title}}
+Description:{{apigeneratorcontroller.description}}
+started_at:{{apigeneratorcontroller.created_at}}
+
+<li><a href="#" data-request="onSignForm">Sign Petition
+
+
+
+</></></ul>
+
+<div id="workspace1"> </div>

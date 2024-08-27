@@ -1,0 +1,262 @@
+title = "Petitions"
+url = "/petitions"
+layout = "default"
+description = "The main forum page with all the channels."
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use AhmadFatoni\ApiGenerator\Controllers\ApiGenerator\api\SignatureController;
+use Exception;
+use Http;
+function onStart()
+{
+    try {
+        
+       $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:1');
+
+        $petitions = json_decode($response)->data;
+
+        foreach ($petitions as $petition) {
+             if (!empty($petition->id)) {
+                 
+                 
+                    // Exclude removed and withdrawn petitionshttp://localhost
+                 
+            $countResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/openpetition-count');
+           // $openpetition_count = json_decode($countResponse)->count;
+           // $petition->openpetition_count = $openpetition_count;
+            
+               $response_data = json_decode($countResponse);
+              if ($response_data && isset($response_data->count)) {
+             $openpetition_count = $response_data->count;
+             $petition->openpetition_count =  $openpetition_count;
+             } else {
+              $petition->openpetition_count = 0;
+              }
+            
+            
+             }
+        }
+        
+        $this['petitions'] = $petitions;
+        
+        $closedresponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:4');
+
+$closedpetitions = json_decode($closedresponse)->data;
+       
+
+        foreach ($closedpetitions as $closedpetition) {
+            if (!empty($closedpetition->id)) {
+            $countResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$closedpetition->id.'/closedpetition-count');
+           // $closedpetition_count = json_decode($countResponse)->count;
+          //  $closedpetition->closedpetition_count = $closedpetition_count;
+            
+            
+               $response_data = json_decode($countResponse);
+              if ($response_data && isset($response_data->count)) {
+             $closedpetition_count = $response_data->count;
+            $closedpetition->closedpetition_count =  $closedpetition_count;
+             } else {
+              $closedpetition->closedpetition_count = 0;
+              }
+            
+            
+            
+            }
+        }
+
+        $this['closedpetitions'] = $closedpetitions;
+
+        
+    } catch (ApplicationException $e) {
+        $this['petitions'] = [];
+         $this['closedpetitions'] =[];
+    }
+}
+
+/*function onClosePetitions()
+{
+    try {
+        $openresponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:4');
+
+$openpetitions = json_decode($openresponse)->data;
+       
+
+        foreach ($openpetitions as $openpetition) {
+            $countResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$openpetition->id.'/closedpetition-count');
+            $closedpetition_count = json_decode($countResponse)->count;
+            $openpetition->closedpetition_count = $closedpetition_count;
+        }
+
+        $this['openpetitions'] = $openpetitions;
+    } catch (ApplicationException $e) {
+        $this['openpetitions'] = [];
+    }
+}*/
+?>
+==
+<br><br>
+<section id="layout-content">
+    <div class="rainlab-forum">
+        <table class="forum-table">
+            <tbody class="story-headline">
+                <tr class="root-channel"  style="backgroud-color:lightgray;">
+                    <th colspan="2">Petition</th>
+                    <th class="counter-column">Petitions</th>
+                    <th class="counter-column"></th>
+                    <th class="activity-column"></th>
+                </tr>
+                <tr class="forum-channel">
+                    <td class="indicator-column">
+                        <div class="topic-indicator "></div>
+                    </td>
+                    <td>
+                        <h5>
+                            <a href="{{'openpetition'|page}}"><h2 style="color:#337ab7;">Open petition</h2></a>
+                        </h5>
+                        <p>All petitions run for 6 months.</p>
+                    </td>
+                    <td class="counter-column">
+                        {% if petitions is not empty and petition.reason is empty  %}
+                         
+                            {% set petition = petitions[0] %}
+                           
+                                <p><span class="badge badge-danger" style="background-color:#275937;">{{ petition.openpetition_count }}</span></p>
+                                
+                        {% else %}
+                            <p><span class="badge badge-danger" style="background-color:#275937;">0</span></p>
+                          
+                        {% endif %}
+                    </td>
+                    <td class="counter-column">
+                        <p></p>
+                    </td>
+                    <td class="activity-column">
+                    </td>
+                </tr>
+                <tr class="forum-channel">
+                    <td class="indicator-column">
+                        <div class="topic-indicator "></div>
+                    </td>
+                    <td>
+                        <h5>
+                            <a href="closedpetition"><h2 style="color:#337ab7">Closed Petition</h2></a>
+                        </h5>
+                        <p>These are closed petitions.</p>
+                    </td>
+                    <td class="counter-column">
+                        {% if closedpetitions is not empty %}
+                            {% set petition = closedpetitions[0] %}
+                                <p><span class="badge badge-danger" style="background-color:#275937;">{{ petition.closedpetition_count }}</span></p>
+                       
+                        {% else %}
+                            <p><span class="badge badge-danger" style="background-color:#275937;">0</span></p>
+                          
+                        {% endif %}
+                    </td>
+                    <td class="counter-column">
+                        <p></p>
+                    </td>
+                    <td class="activity-column">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<br><br>
+<style>
+    .badge {
+   font-size: 2em;
+   display: inline-block;
+   width: 50%;
+   height: 30px;
+   border-radius: 20%;
+   text-align: center;
+   line-height: 30px;
+}
+
+.rainlab-forum .forum-table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+table {
+    background-color: transparent;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+table {
+    display: table;
+    box-sizing: border-box;
+    text-indent: initial;
+    border-spacing: 2px;
+    border-color: gray;
+}
+
+tr.root-channel {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+    background-color: #Efeade;
+    
+   
+}
+
+.rainlab-forum .forum-table td.indicator-column {
+    width: 12px;
+    text-align: right;
+}
+
+.rainlab-forum .forum-table th, .rainlab-forum .forum-table td {
+    padding: 8px;
+    line-height: 20px;
+    text-align: left;
+    vertical-align: top;
+    border-top: 1px solid #cccccc;
+}
+
+table {
+   
+    text-indent: initial;
+    border-spacing: 2px;
+}
+
+.story-headline
+  {
+    padding: 10px;
+    padding-left: 10px;
+    position: relative;
+    font-family: ff-dax-pro, sans-serif;
+    border-bottom: 1px solid #f6f3ec;
+    text-transform: uppercase;
+    letter-spacing: -0.7px;
+    line-height: 1.2;
+    color: #275937;
+
+  }
+
+  .story-headline:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: calc(100% - 4px);
+    left: 0;
+    top: 2px;
+}
+
+a {
+    line-height: inherit;
+    color: #275937;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  
+</style>

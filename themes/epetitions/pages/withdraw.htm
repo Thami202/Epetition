@@ -1,0 +1,137 @@
+url = "/withdraw/:id/"
+layout = "default"
+title = "withdraw"
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+function onStart() {
+
+try{
+$response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id'));
+
+$this['apigeneratorcontroller'] = json_decode($response);
+
+ }
+    catch(ApplicationException $e) {
+        $this['apigeneratorcontroller'] = [];
+    }
+    
+}
+
+public function onReason()
+{
+   // Send a PUT request to the API endpoint
+   
+   // Send a PUT request to the API endpoint
+   $response = Http::put("http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/".$this->param('id')."/reason/", function($http)  {
+            $http->data([
+
+    'id' =>Auth::getUser()->id,
+    'title' =>Input::get('title'),
+    'intended_to' => Input::get('intended_to'),
+    'description' =>Input::get('description'),
+    'reason' =>Input::get('reason'),
+]);
+ });
+ 
+ if($response->code == 200)
+ {
+    return redirect('/dashboard');
+
+ }else{
+   
+    
+    return  redirect('/withdraw/'.$this->param('id'));
+ }
+ 
+     
+}
+?>
+==
+<section id="portfolio" class="portfolio">
+    
+     <div id="login-row" class="row justify-content-center align-items-center" tabindex="-1" role="dialog">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+
+                           
+                       <form data-request="onReason" id="login-form" class="form"">
+                         {{ form_token()}}
+                            {{ form_sessionKey()}}
+                           
+                                    <h2  >Reason For Withdrawal</h2>
+                
+                   <div class="form-group">
+                                <label class="formField"><span class="formField-text" style="font-size: 18px;">Title</label><br>
+                               <input type="text" name="title" class="form-control" Placeholder="subject of the petition" value="{{ apigeneratorcontroller.title }}" readonly required/>
+                              
+                            </div>
+                          <div class="form-group">
+                                <label for="intented_to" style="font-size: 18px;" >Intended Receipient</label><br>
+                               <input type="text" name="intended_to" class="form-control" Placeholder="NA/NCOP/Committees" value="{{apigeneratorcontroller.intended_to  }}" readonly required/>
+                              
+                            </div>
+
+                            <div class="form-group">
+                            <label for="textAreaField" style="font-size: 18px;" >Description</label><br> 
+                        <textarea name="description" class="form-control" id="textAreaField" rows="4"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition" readonly>{{apigeneratorcontroller.description}}</textarea> 
+                        </div>                 
+                            
+
+                            <div class="form-group">
+                            <label for="textAreaField" style="font-size: 18px;" >Reason For withdraw</label><br> 
+                        <textarea name="reason" class="form-control" id="textAreaField" rows="8" cols="81" placeholder="indicate reason why you are withdrawing the petition">{{apigeneratorcontroller.reason}}</textarea> 
+                        </div>
+                     
+
+                            <div class="form-group" >
+                                <br>
+                               
+                               
+                <button type="submit" style="background-color:#9e7c0c;color:#ffffff;" name="Create" class="accountButton"><img  style="height:28px;" src="{{ 'assets/images/delete.png'|theme }}"/>Submit</button>
+                        </form>
+                      
+                    </div>
+                    
+            </div>
+        </div>
+      <div class="container">
+
+         <div class="row portfolio-container">
+             </div>         
+      </div>
+    </section>
+
+    <style>
+        .accountButton {
+           border: none;
+           border-radius: 0px;
+           color: whitesmoke;
+           height: 40px;
+           width: 250px;
+           background-color: #9e7c0c !important;
+           color: white !important;
+           padding-left: 40px !important;
+           text-align: left !important;
+           margin: 10px;
+           padding-top: 3px;
+           border-radius: 20px;
+           background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+       }
+       
+       button {
+           background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+           background-color: #9e7c0c !important;
+           color: white;
+           border-radius: 20px;
+           border: none;
+           height: 40px;
+       }
+       
+       
+         </style>

@@ -1,0 +1,804 @@
+title = "idcheck"
+url = "/idcheck"
+layout = "default"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+function progressBar()
+{
+    $steps = ['Step 1', 'Step 2', 'Step 3'];
+    $currentStep = Request::input('step', 0);
+    return view('progressbar', [
+        'steps' => $steps,
+        'currentStep' => ($currentStep + 1) * (100 / count($steps)),
+    ]);
+}
+
+
+function onCreatePetition()
+{
+    try {
+        
+        if(Input::hasFile('doc_type')) {
+            $filename = Input::file('doc_type')->getClientOriginalName();
+            $filepath = Input::file('doc_type')->storeAs('uploads/public', $filename);            
+            $fileHandle = (new System\Models\File)->fromData(Storage::get($filepath), $filename);
+        }
+        else {
+            $fileHandle = null;
+        }
+        $response = Http::post('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller', function($http) use($fileHandle) {
+            $http->data([
+        
+                Auth::getUser() ? Auth::getUser()->id : null,
+                'title' =>Input::get('title'),
+                'intended_to' => Input::get('intended_to'),
+                'description' =>Input::get('description'),
+                'name' =>Input::get('name'),
+                'id_number' =>Input::get('id_number'),
+                'phone_number' =>Input::get('phone_number'),
+                'province' =>Input::get('province'),
+                'municipality' =>Input::get('municipality'),
+                'email' =>Input::get('email'),
+                'password' =>'Parliament8@',
+                'password_confirmation' =>'Parliament8@',
+                'file' => $fileHandle != null ? [
+                        'name' => $fileHandle->file_name,
+                        'url' => $fileHandle->getPath()
+                    ] : null,
+                'reason' =>'None'
+            ]);
+        });
+    
+    
+        if($response->code == 200)
+        {
+            return redirect('/dashboard');
+        
+        }else {
+            var_dump('Something went wrong: ' . $response->code);
+            return Redirect::back()->withInput(); // ('/request-petition');
+        } 
+    }
+    catch(ApplicationException $e) {
+        var_dump($e->getMessage());
+        return Redirect::back()->withInput();
+    }
+    
+ }
+?>
+==
+<div>
+    <h1>Request a new e-petition</h1>
+    <div id="multi-step-form-container">
+        <!-- Form Steps / Progress Bar -->
+        <ul class="form-stepper form-stepper-horizontal text-center mx-auto pl-0">
+            <!-- Step 1 -->
+             {% if user %}
+            <li class="form-stepper-active text-center form-stepper-list" step="1">
+                <a class="mx-2">
+                    <span class="form-stepper-circle">
+                        <span>1</span>
+                    </span>
+                    <div class="label">Petition details</div>
+                </a>
+            </li>
+            <!-- Step 2 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="2">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>2</span>
+                    </span>
+                    <div class="label text-muted">Petition terms</div>
+                </a>
+            </li>
+            <!-- Step 3 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="3">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>3</span>
+                    </span>
+                    <div class="label text-muted">Attachments</div>
+                </a>
+            </li>
+            {% else %}
+             <li class="form-stepper-active text-center form-stepper-list" step="1">
+                <a class="mx-2">
+                    <span class="form-stepper-circle">
+                        <span>1</span>
+                    </span>
+                    <div class="label">Petition details</div>
+                </a>
+            </li>
+            <!-- Step 2 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="2">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>2</span>
+                    </span>
+                    <div class="label text-muted">Petition terms</div>
+                </a>
+            </li>
+            <!-- Step 3 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="3">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>3</span>
+                    </span>
+                    <div class="label text-muted">Attachments</div>
+                </a>
+            </li>
+            
+             <li class="form-stepper-unfinished text-center form-stepper-list" step="4">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>4</span>
+                    </span>
+                    <div class="label text-muted">Profile</div>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <!-- Step Wise Form Content -->
+        <form id="userAccountSetupForm" name="userAccountSetupForm"   data-request="onCreatePetition" data-request-files enctype="multipart/form-data" method="POST">
+            <!-- Step 1 Content -->
+            {% if user %}
+            <section id="step-1" class="form-step">
+                <h2 class="font-normal">Petition details</h2>
+                <!-- Step 1 input fields -->
+                <div class="mt-3">
+                  
+                    <div class="form-group" >
+                    <label class="formField"><span class="formField-text">Petition Title <span class="mandatory">*</span></span>
+                 <span class="formField-validation"></span>
+                <input class="form-control" id="title" aria-label="Petition title" type="text" name="title" required></label>
+                  </div> 
+             <div class="form-group">
+
+<label class="formField"><span class="formField-text">Intended to recipient of the petition<span class="mandatory">*</span></span><span class="formField-validation"></span>
+<input class="form-control" id="intended_to" aria-label="intended_to" type="text" name="intended_to" required>
+
+
+
+                    </div>
+                </div>
+                <div class="mt-3">
+                
+              
+                
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="2">Next</button>
+                </div>
+            </section>
+            <!-- Step 2 Content, default hidden on page load. -->
+            <section id="step-2" class="form-step d-none">
+                <h2 class="font-normal">Terms of your petition </h2>
+                <!-- Step 2 input fields -->
+                <div class="mt-3">
+                    <div class="form-group" >
+    <label for="textAreaField" style="color:black;" class="text-info">Description <span class="mandatory">*</span</label><br> 
+    <p>The reason explains what the problem is and why you are asking for change.&nbsp;</p>
+     <textarea name="description" class="form-control" id="description" rows="4"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition" required></textarea> 
+    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#275937;color:#ffffff" type="button" step_number="1">Prev</button>
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="3">Next</button>
+                </div>
+            </section>
+            
+                  <section id="step-3" class="form-step d-none">
+                <h2 class="font-normal">Attachment of your petition  </h2>
+                <!-- Step 2 input fields -->
+                
+                <div class="mt-3">
+                <fieldset><h5 class="formFieldTitle">Petition Attachment</h5><span class="formField-validation"></span><p><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to understand. People are more likely to sign your petition if they understand why you are making the request.<br></em><br>
+</fieldset>
+<div class="form-group" >
+ <input type="file" class="form-control" name="doc_type" />
+ 
+ </div>
+                
+               </div>
+                <div class="mt-3">
+                   
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#275937;color:#ffffff" type="button" step_number="2">Prev</button>
+                    <button class="btn btn-default submit-btn" style="background-color:#9e7c0c;color:#ffffff" type="submit">Save</button>
+                </div>
+            </section>
+            
+            {% else %}
+            
+            
+                  <section id="step-1" class="form-step">
+                <h2 class="font-normal">Petition details</h2>
+                <!-- Step 1 input fields -->
+                <div class="mt-3">
+                
+                    <div class="form-group" >
+                    <label class="formField"><span class="formField-text">Petition Title <span class="mandatory">*</span></span>
+                 <span class="formField-validation"></span>
+                <input class="form-control required-input" id="title" aria-label="Petition title" type="text" name="title" required></label>
+                  </div> 
+             <div class="form-group">
+
+<label class="formField"><span class="formField-text">Intended to recipient of the petition<span class="mandatory">*</span></span><span class="formField-validation"></span>
+<input required class="form-control required-input" id="intended_to" aria-label="intended_to" type="text" name="intended_to" >
+
+
+
+                    </div>
+                </div>
+                <div class="mt-3">
+                
+                
+                
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#9e7c0c;color:#ffffff" type="button"  step_number="2">Next</button>
+                </div>
+            </section>
+            <!-- Step 2 Content, default hidden on page load. -->
+            <section id="step-2" class="form-step d-none">
+                <h2 class="font-normal">Terms of your petition </h2>
+                <!-- Step 2 input fields -->
+                <div class="mt-3">
+                    <div class="form-group" >
+    <label for="textAreaField" style="color:black;" class="text-info">Description <span class="mandatory">*</span</label><br> 
+    <p>The reason explains what the problem is and why you are asking for change.&nbsp;</p>
+     <textarea name="description" class="form-control" id="description" rows="4"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition" required></textarea> 
+    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-default btn-navigate-form-step"  style="background-color:#275937;color:#ffffff" type="button" step_number="1">Prev</button>
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="3">Next</button>
+                </div>
+            </section>
+            
+                  <section id="step-3" class="form-step d-none">
+                <h2 class="font-normal">Attachment of your petition  </h2>
+                <!-- Step 2 input fields -->
+                
+                <div class="mt-3">
+                <fieldset><h5 class="formFieldTitle">Petition Attachment</h5><span class="formField-validation"></span><p><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to understand. People are more likely to sign your petition if they understand why you are making the request.<br></em><br>
+</fieldset>
+<div class="form-group" >
+ <input type="file" class="form-control" name="doc_type" />
+ 
+ </div>
+                
+               </div>
+                <div class="mt-3">
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#275937;color:#ffffff" type="button" step_number="2">Prev</button>
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="4">Next</button>
+                </div>
+            </section>
+            
+            <!-- Step 3 Content, default hidden on page load. -->
+            <section id="step-4" class="form-step d-none">
+                <h2 class="font-normal">Please fill in your details – you are the Principal Petitioner</h2>
+                <!-- Step 3 input fields -->
+                <div class="mt-3">
+                  
+                  
+<div class="form-group" >
+  <label for="registerName">Full Name</label>
+  <input name="name" type="text" class="form-control" id="name" placeholder="Enter your full name" required />
+
+</div>
+
+
+<div class="form-group">
+<div id="error"></div>
+    <label for="registerID">ID Number</label>
+    <input name="id_number" type="text" class="form-control" placeholder="Enter ID Number" id="id_number" maxlength="13" onkeypress="return IsNumeric(event);" required/>
+  
+</div>
+
+
+
+
+<div class="form-group">
+    <label for="registerPhoneNumber">Phone Number</label>
+    <input name="phone_number" type="text" class="form-control" id="id_number" maxlength="11"
+        placeholder="Enter Phone Number"  required/>
+       
+</div>
+
+
+
+
+
+<div class="form-group">
+    <label for="registerProvince">Province</label><br>
+    <select id="select-field1" onchange="updateSelectField()" id="province" name="province" class="form-control">
+        <option value="">Select...</option>
+        <option value="0">Eastern Cape</option>
+        <option value="1">Free State</option>
+        <option value="Gauteng">Gauteng</option>
+        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+        <option value="Limpopo">Limpopo</option>
+        <option value="Mpumalanga">Mpumalanga</option>
+        <option value="Northern Cape">Northern Cape</option>
+        <option value="North West">North West</option>
+        <option value="Western Cape">Western Cape</option>
+    </select>
+   
+</div>
+
+<div class="form-group">
+    <label for="registerMunicipality">Municipality</label>
+
+    <select id="select-field2" name="municipality" id="municipality" class="form-control">
+        <option value="City Of Cape Town">City Of Cape Town</option>
+    </select>
+
+  
+</div>
+
+
+
+<div class="form-group">
+   
+    <label for="registerEmail">Email</label>
+    <input name="email" type="email" class="form-control" id="email" placeholder="Enter your email"  required/>
+    
+</div>
+                  
+                </div>
+                
+                {% endif %}
+                {% if user %}
+                <div class="mt-3" style="display:none">
+                    <button class="btn btn-default btn-navigate-form-step" style="background-color:#275937;color:#ffffff" type="button" step_number="3">Prev</button>
+                    <button class="btn btn-default submit-btn" style="background-color:#9e7c0c;color:#ffffff" type="submit">Save</button>
+                </div>
+                
+                {% else %}
+                <div class="mt-3">
+                    <button class="btn btn-default btn-navigate-form-step" type="button" style="background-color:#275937;color:#ffffff" step_number="3">Prev</button>
+                    <button class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff" type="submit">Save</button>
+                </div>
+                {% endif%}
+                
+            </section>
+        </form>
+    </div>
+</div>
+
+<script>
+
+/**
+ * Define a function to navigate betweens form steps.
+ * It accepts one parameter. That is - step number.
+ */
+const navigateToFormStep = (stepNumber) => {
+    /**
+     * Hide all form steps.
+     */
+    document.querySelectorAll(".form-step").forEach((formStepElement) => {
+        formStepElement.classList.add("d-none");
+    });
+    /**
+     * Mark all form steps as unfinished.
+     */
+    document.querySelectorAll(".form-stepper-list").forEach((formStepHeader) => {
+        formStepHeader.classList.add("form-stepper-unfinished");
+        formStepHeader.classList.remove("form-stepper-active", "form-stepper-completed");
+    });
+    /**
+     * Show the current form step (as passed to the function).
+     */
+    document.querySelector("#step-" + stepNumber).classList.remove("d-none");
+    /**
+     * Select the form step circle (progress bar).
+     */
+    const formStepCircle = document.querySelector('li[step="' + stepNumber + '"]');
+    /**
+     * Mark the current form step as active.
+     */
+    formStepCircle.classList.remove("form-stepper-unfinished", "form-stepper-completed");
+    formStepCircle.classList.add("form-stepper-active");
+    /**
+     * Loop through each form step circles.
+     * This loop will continue up to the current step number.
+     * Example: If the current step is 3,
+     * then the loop will perform operations for step 1 and 2.
+     */
+    for (let index = 0; index < stepNumber; index++) {
+        /**
+         * Select the form step circle (progress bar).
+         */
+        const formStepCircle = document.querySelector('li[step="' + index + '"]');
+        /**
+         * Check if the element exist. If yes, then proceed.
+         */
+        if (formStepCircle) {
+            /**
+             * Mark the form step as completed.
+             */
+            formStepCircle.classList.remove("form-stepper-unfinished", "form-stepper-active");
+            formStepCircle.classList.add("form-stepper-completed");
+        }
+    }
+};
+
+
+
+
+/**
+ * Select all form navigation buttons, and loop through them.
+ */
+document.querySelectorAll(".btn-navigate-form-step").forEach((formNavigationBtn) => {
+    /**
+     * Add a click event listener to the button.
+     */
+    formNavigationBtn.addEventListener("click", () => {
+        /**
+         * Get the value of the step.
+         */
+        const stepNumber = parseInt(formNavigationBtn.getAttribute("step_number"));
+         
+     
+         
+         
+         /**
+         * Call the function to navigate to the target form step.
+         */
+        
+            navigateToFormStep(stepNumber);
+        
+    });
+});
+
+</script>
+
+
+
+<script>
+    var values = [
+        ["Buffalo City Metropolitan", "Nelson Mandela Bay Metropolitan", "Matatiele Local", "Ntabankulu Local", "Umzimvubu Local"],
+        ["Mangaung Metropolitan", "Mafube Local", "Metsimaholo Local", "Moqhaka Local", "Ngwathe Local"],
+       
+    ];
+
+    function updateSelectField() {
+        var selectField1 = document.getElementById("select-field1");
+        var selectField2 = document.getElementById("select-field2");
+        var selectedIndex = selectField1.value;
+
+        selectField2.innerHTML = "";
+
+        for (var i = 0; i < values[selectedIndex].length; i++) {
+            var option = document.createElement("option");
+            option.value = i;
+            option.text = values[selectedIndex][i];
+
+            selectField2.appendChild(option);
+        }
+    }
+</script>
+
+
+
+<script>
+function isNumeric(input) {
+  return /^[0-9]+$/.test(input);
+}
+
+const inputField = document.getElementById("id_number");
+
+
+inputField.addEventListener("blur", function(event) {
+  const input = event.target.value;
+  if (!isNumeric(input)) {
+    alert("Please enter a valid numeric value.");
+    inputField.value = ""; // Clear the input field
+    
+  }
+});
+</script>
+
+
+
+
+<script>
+const nextButton = document.querySelector('.next-button');
+const requiredInputs = document.querySelectorAll('.required-input');
+
+nextButton.addEventListener('click', function(event) {
+  let inputsFilled = true;
+  
+  requiredInputs.forEach(function(input) {
+    if (!input.value) {
+      inputsFilled = false;
+      input.classList.add('error');
+    } else {
+      input.classList.remove('error');
+    }
+  });
+  
+  if (!inputsFilled) {
+    event.preventDefault();
+    alert('Please fill out all required fields before continuing.');
+  }
+});
+
+
+</script>
+
+
+
+
+<script type="text/javascript">
+  $('#error_message').html('');
+
+
+if(document.getElementById('title').value==='')
+ {
+     $("#error_title").html("Please enter title of your petition.");
+        focusSet = true;
+}else{
+    $("#error_title").html("");
+    focusSet = false;
+  }
+if(document.getElementById('intended_to').value==='')
+ {
+    $("#error_intended_to").html("Pleas  enter intended recipient of the petition.");
+     focusSet = true;
+}else{
+     $("#error_intended_to").html('');
+    focusSet = false;
+    }
+
+    if(document.getElementById('description').value==='')
+ {
+    $("#error_description").html("Pleas  enter description of the petition.");
+     focusSet = true;
+}else{
+     $("#error_description").html('');
+    focusSet = false;
+    }
+
+    if(document.getElementById('name').value==='')
+ {
+    $("#error_name").html("Pleas e enter your full name.");
+     focusSet = true;
+}else{
+     $("#error_name").html('');
+    focusSet = false;
+    }
+    if(document.getElementById('id_number').value==='')
+    {
+     if ($("#id_number").parent().next(".validation").length == 0)
+        {
+            $("#id_number").parent().after("<div class='validation error-display'>Please enter ID number.</div>");
+         }
+          focusSet = true;
+     }else{
+         $("#id_number").parent().next(".validation").remove(); // remove it
+        focusSet = false;
+     }  
+
+     if(document.getElementById('phone_number').value==='')
+     {
+        $('#error_phone_number').html('Please enter phone_number');
+             focusSet = true;
+        }else{
+         $("#error_phone_number").html('');
+            focusSet = false;
+        } 
+
+        if(document.getElementById('province').value=='-1')
+        {
+            $('#error_province').html('Please select province.');
+                focusSet = true;
+         }else{
+            $('#error_province').html('');
+            focusSet = false;
+         }  
+
+         if(document.getElementById('municipality').value=='-1')
+        {
+            $('#error_municipality').html('Please select municipality.');
+                focusSet = true;
+         }else{
+            $('#error_municipality').html('');
+            focusSet = false;
+         }  
+
+
+ if(document.getElementById('email').value==='')
+    {
+    if ($("#email").parent().next(".validation").length == 0)
+    {
+     $("#email").parent().after("<div class='validation error-display'>Please enter Email.</div>");
+    }
+                        focusSet = true;
+                    }else{
+                        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                        if(!re.test(String($('#email').val()).toLowerCase()))
+                        {
+                             $("#email").parent().next(".validation").remove(); // remove it
+                            if ($("#email").parent().next(".validation").length == 0)
+                            {
+                             $("#email").parent().after("<div class='validation error-display'>Invalid Email.</div>");
+                            }
+                            focusSet = true;
+                        }else{
+                            $("#email").parent().next(".validation").remove(); // remove it
+                            focusSet = false;
+                        }
+                    }
+
+                
+
+
+</script>
+
+
+
+</script>
+
+<style>
+h1 {
+    text-align: center;
+}
+h2 {
+    margin: 0;
+}
+#multi-step-form-container {
+    margin-top: 5rem;
+}
+.text-center {
+    text-align: center;
+}
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+.pl-0 {
+    padding-left: 0;
+}
+.button {
+    padding: 0.7rem 1.5rem;
+    border: 1px solid #4361ee;
+    background-color: #4361ee;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.submit-btn {
+    border: 1px solid #0e9594;
+    background-color: #0e9594;
+}
+.mt-3 {
+    margin-top: 2rem;
+}
+.d-none {
+    display: none;
+}
+.form-step {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 3rem;
+}
+.font-normal {
+    font-weight: normal;
+}
+ul.form-stepper {
+    counter-reset: section;
+    margin-bottom: 3rem;
+}
+ul.form-stepper .form-stepper-circle {
+    position: relative;
+}
+ul.form-stepper .form-stepper-circle span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+}
+.form-stepper-horizontal {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+ul.form-stepper > li:not(:last-of-type) {
+    margin-bottom: 0.625rem;
+    -webkit-transition: margin-bottom 0.4s;
+    -o-transition: margin-bottom 0.4s;
+    transition: margin-bottom 0.4s;
+}
+.form-stepper-horizontal > li:not(:last-of-type) {
+    margin-bottom: 0 !important;
+}
+.form-stepper-horizontal li {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: start;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+}
+.form-stepper-horizontal li:not(:last-child):after {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    height: 1px;
+    content: "";
+    top: 32%;
+}
+.form-stepper-horizontal li:after {
+    background-color: #dee2e6;
+}
+.form-stepper-horizontal li.form-stepper-completed:after {
+    background-color: #4da3ff;
+}
+.form-stepper-horizontal li:last-child {
+    flex: unset;
+}
+ul.form-stepper li a .form-stepper-circle {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin-right: 0;
+    line-height: 1.7rem;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.38);
+    border-radius: 50%;
+}
+.form-stepper .form-stepper-active .form-stepper-circle {
+    background-color: #9e7c0c !important;
+    color: #fff;
+}
+.form-stepper .form-stepper-active .label {
+    color: #B3995D !important;
+}
+.form-stepper .form-stepper-active .form-stepper-circle:hover {
+    background-color: #9e7c0c !important;
+    color: #fff !important;
+}
+.form-stepper .form-stepper-unfinished .form-stepper-circle {
+    background-color: #f8f7ff;
+}
+.form-stepper .form-stepper-completed .form-stepper-circle {
+    background-color: #275937 !important;
+    color: #fff;
+}
+.form-stepper .form-stepper-completed .label {
+    color: #275937 !important;
+}
+.form-stepper .form-stepper-completed .form-stepper-circle:hover {
+    background-color: #Efeade !important;
+    color: #fff !important;
+}
+.form-stepper .form-stepper-active span.text-muted {
+    color: #fff !important;
+}
+.form-stepper .form-stepper-completed span.text-muted {
+    color: #fff !important;
+}
+.form-stepper .label {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+.form-stepper a {
+    cursor: default;
+}
+
+</style>

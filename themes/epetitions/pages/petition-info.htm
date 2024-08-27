@@ -1,0 +1,305 @@
+title = "Petition info"
+url = "/petition-info"
+layout = "default"
+is_hidden = 0
+==
+<br>
+<div>
+  <details>
+    <summary class="accordion-title"><h2>What is Petition?</h2></summary>
+    <div class="accordion-content">
+      <p>Petition is a written request, complaint or representation to the Chairperson of National Council of Provinces (NCOP) and Speaker of the National Assembly for intervention in a certain matter after having exhausted all other available avenues. Petitioning must therefore be used as a last resort. Matters before a court of law or tribunal or any matter, which have already been dealt with by Parliament, may not be the subject of a petition.</p>
+    </div>
+  </details>
+  
+              <details>
+                <summary class="accordion-title"><h2>Type of Petition?</h2></summary>
+                <div class="accordion-content"> <p>There are generally two types of petitions, namely special petitions and public or general petitions. A special petition is when an individual makes a specific request or asks for personal relief from the State, which is not authorised by law, such as access to a pension. A public petition is when a group of citizens with similar interests request general relief or redress of a grievance.</p></div>
+              </details>
+              <details>
+                <summary class="accordion-title"><h2>Who can submit Petition?</h2></summary>
+                <div class="accordion-content"> <p>Any person who acts:
+                    a) In his or her own interests;
+                    b) In the interest of another person who is not in a position to submit a petition in his or her own name or its name;
+                    c) As a member of or in in the interest of a group or class of persons; or
+                    d) In the public interest.</p></div>
+              </details>
+              <details>
+                <summary class="accordion-title"><h2>Presentation of a Petition?</h2></summary>
+                <div class="accordion-content"> <p>According to the Constitution, “Everyone has the right, peacefully and unarmed, to assemble, to demonstrate, to picket and to present petitions.” However, there are certain procedures that individuals and/or groups have to follow when petitioning Parliament. The presentation of petitions is governed by the rules of Parliament.
+
+                    The National Assembly requires that a petition be formally presented by a Member of Parliament (MP), for consideration. Therefore the petition must be supported by an MP. You are entitled to approach any MP by contacting them or by visiting the Constituency Office closest to you to seek their assistance with presenting a petition on your behalf.
+                    
+                    The National Council of Provinces (NCOP) does not require that a petition be supported by an MP. However, a petition submitted to the NCOP should be in line with the Council rules.</p></div>
+              </details>
+              <details>
+                <summary class="accordion-title"><h2>How to write a Petition?</h2></summary>
+              <div class="accordion-content"> <p>A petition should comply with the following requirements:
+
+                Be in a form prescribed by the Speaker of the National Assembly (NA) or the Chairperson of the National Council of Provinces (NCOP);
+                Include the name/s and contact detail/s of the petitioner/s;
+                Clearly indicate the intended recipient of the petition (to whom is the petition being addressed);
+                Clearly indicate the nature of the request being made (the subject of the petition);
+                Include a clear motivation for the petition;
+                The petition must be in any of the official languages of South Africa;
+                Be signed by the petitioner(s) themselves (unless the Speaker or Chairperson decides otherwise);
+                Not contain improper or disrespectful language;
+                Must indicate the nature of the relief (assistance) asked from Parliament; and
+                Petitions in braille will also be accepted.</p></div>
+            </details>
+            <details>
+              <summary class="accordion-title"><h2>How to submit a Petition in Parliament?</h2></summary>
+                <div class="accordion-content"> <p>In the event that the petition is addressed to the Speaker of the National Assembly, it is advisable that you talk to an MP before submitting your petition as they can assist you with the format and content of your petition.
+
+                    If there are supporting documents on the issue raised by the petitioner(s), attach them to the petition.
+                    
+                    Your petition will be lodged with the Secretary to Parliament to review it and confirm that it is correct in format and content, and then submitted to the Speaker of the National Assembly or the Chairperson of the National Council of Provinces.
+                    
+                    If the petition complies with all the requirements, it will be tabled in the relevant House and referred to the relevant Committee for consideration and report.
+                    
+                    An approved format for your petition may be obtained from Parliament’s Clerk of the Papers. Once you have drafted your petition, it must thereafter be handed in at the office of the Clerk of the Papers.
+                    
+                    Enquiries on petitions may be directed to:
+                    The Clerk of Papers
+                    Tel: (021) 403-2224 and Fax: (021) 403-3033 or,P.O.Box 15, Cape Town, 8000.</p></div>
+              </details>
+     
+</div>
+<br>
+<style>
+  .accordion-title:hover, .accordion-title:focus {
+    background: #eee8db;
+    color: #9E7C0C;
+  }
+
+  .accordion-title {
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    background: #f6f3ec;
+    padding-left: 20px;
+    color:#9E7C0C;
+  }
+
+  .accordion-title::before {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: calc(100% - 50rem);
+    transform: translateY(-50%);
+    font-size: 2.5rem;
+  }
+
+  .accordion-title.active::before {
+    content: '-';
+  }
+
+  .accordion-title h2 {
+    position: relative;
+    display: inline-block;
+  }
+
+  .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+  }
+
+  .accordion-title.active + .accordion-content {
+    max-height: 100vh;
+  }
+
+  .is-active > .accordion-title::before {
+    content: '\2013';
+  }
+</style>
+<script>
+ const accordionTitles = document.querySelectorAll('.accordion-title');
+const accordionContents = document.querySelectorAll('.accordion-content');
+let activeIndex = -1;
+
+accordionTitles.forEach((title, index) => {
+  title.addEventListener('click', () => {
+    // Toggle the active class on the clicked title
+    title.classList.toggle('active');
+
+    // Check if the clicked title corresponds to the currently active accordion content
+    if (activeIndex === index) {
+  accordionContents[activeIndex].classList.toggle('content-active');
+  title.classList.toggle('active');
+  activeIndex = index; // Update activeIndex to the clicked title's index
+  history.pushState(null, null, window.location.pathname);
+  return;
+}
+
+
+    // Close the currently active accordion content, if there is one
+    if (activeIndex >= 0) {
+      accordionTitles[activeIndex].classList.toggle('active');
+      accordionContents[activeIndex].classList.toggle('content-active');
+    }
+
+    // Add the active class on the content section that corresponds to the clicked title
+    accordionContents[index].classList.toggle('content-active');
+    activeIndex = index;
+    history.pushState({ activeIndex }, null, `#${index}`);
+  });
+});
+
+// Add event listener for backwards navigation
+window.addEventListener('popstate', event => {
+  const state = event.state;
+  if (state) {
+    // Close the currently active accordion content, if there is one
+    if (activeIndex >= 0) {
+      accordionTitles[activeIndex].classList.remove('active');
+      accordionContents[activeIndex].classList.remove('content-active');
+    }
+
+    // Add the active class on the content section that corresponds to the accordion in the state
+    accordionContents[state.activeIndex].classList.add('content-active');
+    accordionTitles[state.activeIndex].classList.add('active');
+    activeIndex = state.activeIndex;
+  } else {
+    // Close the currently active accordion content, if there is one
+    if (activeIndex >= 0) {
+      accordionTitles[activeIndex].classList.remove('active');
+      accordionContents[activeIndex].classList.remove('content-active');
+      activeIndex = -1;
+    }
+  }
+});
+
+// Add event listener for forward navigation
+window.addEventListener('pushstate', event => {
+  const state = event.state;
+  if (state) {
+    // Close the currently active accordion content, if there is one
+    if (activeIndex >= 0) {
+      accordionTitles[activeIndex].classList.remove('active');
+      accordionContents[activeIndex].classList.remove('content-active');
+    }
+
+    // Add the active class on the content section that corresponds to the accordion in the state
+    accordionContents[state.activeIndex].classList.add('content-active');
+    accordionTitles[state.activeIndex].classList.add('active');
+    activeIndex = state.activeIndex;
+  } else {
+    // Close the currently active accordion content, if there is one
+    if (activeIndex >= 0) {
+      accordionTitles[activeIndex].classList.remove('active');
+      accordionContents[activeIndex].classList.remove('content-active');
+      activeIndex = -1;
+    }
+  }
+});
+
+  </script>
+  
+
+
+<!--<style>
+
+.accordion-title:hover, .accordion-title:focus {
+    background: #eee8db;
+    color: #9E7C0C;
+}
+
+.accordion-title {
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  background: #f6f3ec;
+  padding-left: 20px;
+  color:#9E7C0C;
+}
+
+.accordion-title::before {
+  content: '+';
+  position: absolute;
+  top: 50%;
+  left: calc(100% - 50rem);
+  transform: translateY(-50%);
+  font-size: 2.5rem;
+ 
+}
+
+.accordion-title.active::before {
+  content: '-';
+}
+
+.accordion-title h2 {
+  position: relative;
+  display: inline-block;
+}
+
+
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.accordion-title.active + .accordion-content {
+  max-height: 100vh;
+}
+
+.is-active > .accordion-title::before {
+    content: '\2013';
+}
+
+
+
+
+
+
+  </style>
+<script>
+const accordionTitles = document.querySelectorAll('.accordion-title');
+const accordionContents = document.querySelectorAll('.accordion-content');
+let activeIndex = -1;
+
+accordionTitles.forEach((title, index) => {
+  title.addEventListener('click', () => {
+    // Toggle the active class on the clicked title
+    title.classList.toggle('active');
+
+    // Check if the clicked title corresponds to the currently active accordion content
+    if (activeIndex === index && accordionContents[index].classList.contains('content-active')) {
+      accordionContents[activeIndex].classList.toggle('content-active');
+      activeIndex = -1;
+      return;
+    }
+
+    // Close the currently active accordion content, if there is one
+    if (activeIndex >= 0) {
+      accordionTitles[activeIndex].classList.toggle('active');
+      accordionContents[activeIndex].classList.toggle('content-active');
+    }
+
+    // Add the active class on the content section that corresponds to the clicked title
+    accordionContents[index].classList.toggle('content-active');
+    activeIndex = index;
+
+    // Check if the user is clicking on the first title while the second content is active,
+    // or on the last title while the second-to-last content is active
+    if ((activeIndex === 0 && accordionContents[1].classList.contains('content-active')) ||
+        (activeIndex === accordionTitles.length - 1 && accordionContents[accordionTitles.length - 2].classList.contains('content-active'))) {
+      let targetIndex = activeIndex === 0 ? 1 : accordionTitles.length - 2;
+      accordionTitles[targetIndex].classList.remove('active');
+      accordionContents[targetIndex].classList.remove('content-active');
+      activeIndex = -1;
+      setTimeout(() => {
+        accordionContents[activeIndex === 0 ? 0 : accordionTitles.length - 1].classList.add('content-active');
+        accordionTitles[activeIndex === 0 ? 0 : accordionTitles.length - 1].classList.add('active');
+        activeIndex = activeIndex === 0 ? 0 : accordionTitles.length - 1;
+      }, 300);
+    }
+  });
+});
+
+
+
+
+</script>-->

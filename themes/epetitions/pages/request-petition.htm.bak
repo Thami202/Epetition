@@ -1,0 +1,1364 @@
+title = "Request Petition"
+url = "/request-petition"
+layout = "default"
+description = "Request Petition"
+is_hidden = 0
+
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+use RainLab\User\Models\User;
+use AhmadFatoni\ApiGenerator\Models\ApiGenerator;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
+use Flash;
+
+
+
+
+
+function progressBar()
+{
+    $steps = ['Step 1', 'Step 2', 'Step 3'];
+    $currentStep = Request::input('step', 0);
+    return view('progressbar', [
+        'steps' => $steps,
+        'currentStep' => ($currentStep + 1) * (100 / count($steps)),
+    ]);
+}
+
+
+function onCreatePetition()
+{
+
+   
+
+    
+    try {
+
+        
+    
+        
+        if(Input::hasFile('doc_type')) {
+            $filename = Input::file('doc_type')->getClientOriginalName();
+            $filepath = Input::file('doc_type')->storeAs('uploads/public', $filename);            
+            $fileHandle = (new System\Models\File)->fromData(Storage::get($filepath), $filename);
+        }
+        else {
+            $fileHandle = null;
+        }
+        $response = Http::post('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller', function($http) use($fileHandle) {
+            $http->data([
+        
+                'title' =>Input::get('title'),
+                'intended_to' => Input::get('intended_to'),
+                'description' =>Input::get('description'),
+                'name' =>Input::get('name'),
+                'id_number' =>Input::get('id_number'),
+                'phone_number' =>Input::get('phone_number'),
+                'province' =>Input::get('province'),
+                'municipality' =>Input::get('municipality'),
+                'email' => Auth::getUser() ? Auth::getUser()->email : Input::get('email'),
+                'password' =>'Parliament8@',
+                'password_confirmation' =>'Parliament8@',
+                   'file' => $fileHandle != null ? [
+                        'name' => $fileHandle->file_name,
+                        'url' => $fileHandle->getPath()
+                    ] : null,
+                'reason' =>'None',
+                'is_activated' => !Auth::check(), // Set is_activated to true if user is not authenticated
+        'activated_at' => !Auth::check() ? now() : null, 
+               
+            ]);
+           
+        });
+         
+        if (!Auth::check()) {
+            // Update User model with is_activated and activated_at fields
+            $user1 = User::where('email', Input::get('email'))->first();
+            if ($user1) {
+                $user1->is_activated = true;
+                $user1->activated_at = now();
+                $user1->save();
+            }
+        }
+        
+
+    
+        if($response->code == 200)
+        {
+            
+            // Retrieve the newly created petition and its reference number
+            $newPetition = ApiGenerator::orderBy('id', 'desc')->first();
+$reference_number = $newPetition->reference_no_public;
+$petition_title = $newPetition->title;
+$intended_to = $newPetition->intended_to;
+$description = $newPetition->description;
+
+$petition_link =url('http://localhost/epetition/showdetails/'.$newPetition->id);      
+        
+           
+ $user =Auth::getUser() ?Auth::getUser()->email: Input::get('email');
+     $user_id = User::where('email', $user)->first()->id;
+     $name = User::where('email', $user)->first()->name;
+   
+
+    
+    // $user = Auth::getUser() ;  
+  
+    if(Auth::check()){
+            // Send email to authenticated user
+
+            $email_message =  'Dear ' . $name . "\n\n" .   
+            'Thank you for reaching out to the Parliament of the Republic of South Africa.' . "\n".
+            'This is an acknowledge receipt of your petition.' . "\n" .
+            'Reference number is ' . $reference_number . "\n".
+            'Please keep this information safely. Thank you for using our platform.' . "\n\n" .
+            'Kind Regards,' . "\n\n".
+            'Epetition Team';
+
+Mail::send([], [], function($message) use ($user, $email_message) {
+    $message->to($user);
+   // $message->from(config('mail.from.address'), config('mail.from.name'));
+   $message->from('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA'); // Update from address and name here
+    $message->subject('Acknowledgement of Petition');
+    $message->setBody($email_message);
+    $message->replyTo('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA');
+});
+
+ /*$user_email = 'lmabai@parliament.gov.za'; // Change this to the admin's email address
+ $user_name = 'Admin'; // Change this to the admin's name
+
+$email_message =  'Dear Sir/Madam' . "\n\n" . 
+'Here are the details of the petition.' . "\n".
+'Title of Petition: ' . $petition_title . "\n" .
+'Intended Recipient: '. $intended_to . "\n" .
+'Description: ' . $description ."\n" . 
+'Reference number is ' . $reference_number . "\n".
+'Kind Regards,' . "\n\n".
+'Epetition Team';
+
+ Mail::send([], [], function($message) use ($user_email, $user_name, $email_message) {
+            $message->to($user_email);
+           // $message->from(config('mail.from.address'), config('mail.from.name'));
+           $message->from('lmabai@parliament.gov.za', 'E-Petitions: Parliament of RSA'); // Update from address and name here
+            $message->subject('New Petition Submitted');
+            $message->setBody($email_message);
+            $message->replyTo('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA');
+        });*/
+
+
+
+   
+
+        // Send email to admin
+        $admin_email = 'lmabai@parliament@parliament.gov.za'; // Change this to the admin's email address
+        $admin_name = 'Admin'; // Change this to the admin's name
+        
+        $email_message = 'Dear ' . $admin_name . "\n\n" .
+            'The following new petition has been submitted on the ePetitions platform.' . "\n\n" .
+            'Petitioner Name: ' . $name . "\n" .
+            'Title of Petition: ' . $petition_title . "\n" .
+            'Petitioner Email: ' . $user . "\n" .
+            'Reference Number: ' . $reference_number . "\n" .
+            'Please click on the link below to view and assess the details of the petition:' . "\n\n" .
+            $petition_link . "\n\n" .
+            'Kind Regards,' . "\n\n" .
+            'Epetition Team.';
+        
+        Mail::send([], [], function($message) use ($admin_email, $admin_name, $email_message) {
+            $message->to($admin_email);
+           // $message->from(config('mail.from.address'), config('mail.from.name'));
+           $message->from('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA'); // Update from address and name here
+            $message->subject('New Petition Submitted');
+            $message->setBody($email_message);
+            $message->replyTo('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA');
+        });
+        
+        
+        
+        session()->flash('info', 'Thank you for creating your Petition');
+        return redirect('/openpetition');
+        
+
+
+} else{
+ 
+
+
+    $email_message= 'Dear ' . $name . "\n\n" .
+    'Thank you for reaching out to the Parliament of the Republic of South Africa.' ."\n" .
+    'This is an acknowledge receipt of your petition.Please find your credentials below for queries or status updates to your petition:' ."\n\n" .
+    'Username is: ' .$user . "\n" .
+    'Password is: Parliament8@' . "\n" .
+    'Reference number is: ' .$reference_number . "\n" .
+    'ePetitions URL to change the default password  http://localhost/epetition/activate/'.$user_id ."\n\n" .
+    'Please keep this information safely. Thank you for using our platform.' ."\n\n" .
+    'Kind Regards,' ."n\n".
+    'Epetition Team';
+    
+
+
+  
+    Mail::send([], [], function($message) use ($user, $email_message) {
+        $message->to($user);
+       // $message->from(config('mail.from.address'), config('mail.from.name'));
+       $message->from('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA'); // Update from address and name here
+        $message->subject('Acknowledgement of Petition');
+        $message->setBody($email_message);
+        $message->replyTo('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA');
+    });
+
+
+    // Send email to admin
+    $admin_email = 'rshibambu@parliament.gov.za'; // Change this to the admin's email address
+    $admin_name = 'Admin'; // Change this to the admin's name
+    
+    $email_message = 'Dear ' . $admin_name . "\n\n" .
+        'The following new petition has been submitted on the ePetitions platform.' . "\n\n" .
+        'Petitioner Name: ' . $name . "\n" .
+        'Title of Petition: ' . $petition_title . "\n" .
+        'Petitioner Email: ' . $user . "\n\n" .
+        'Reference Number: ' . $reference_number . "\n\n" .
+        'Please click on the link below to view and assess the details of the petition:' . "\n\n" .
+        $petition_link . "\n\n" .
+        'Kind Regards,' . "\n\n" .
+        'Epetition Team.';
+
+        Mail::send([], [], function($message) use ($admin_email, $admin_name, $email_message) {
+            $message->to($admin_email);
+           // $message->from(config('mail.from.address'), config('mail.from.name'));
+           $message->from('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA'); // Update from address and name here
+            $message->subject('New Petition Submitted');
+            $message->setBody($email_message);
+            $message->replyTo('noreply@parliament.gov.za', 'E-Petitions: Parliament of RSA');
+        });
+        
+        
+        session()->flash('info', 'Thank you for creating your Petition. Please check your email for login details');
+
+        return redirect('/openpetition');
+        
+
+
+} 
+
+        
+        }else {
+            var_dump('Something went wrong: ' . $response->code);
+            return Redirect::back()->withInput(); // ('/request-petition');
+        } 
+    }
+    catch(ApplicationException $e) {
+        var_dump($e->getMessage());
+        return Redirect::back()->withInput();
+    }
+}
+?>
+==
+<div>
+    <h2>Request new petition</h2>
+    <div id="multi-step-form-container">
+        <!-- Form Steps / Progress Bar -->
+        <ul class="form-stepper form-stepper-horizontal text-center mx-auto pl-0">
+            <!-- Step 1 -->
+            {% if user %}
+            <li class="form-stepper-active text-center form-stepper-list" step="1">
+                <a class="mx-2">
+                    <span class="form-stepper-circle">
+                        <span>1</span>
+                    </span>
+                    <div class="label" style="font-size:14px;">Petition details</div>
+                </a>
+            </li>
+            <!-- Step 2 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="2">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>2</span>
+                    </span>
+                    <div class="label text-muted" style="font-size:14px;">Petition terms</div>
+                </a>
+            </li>
+            <!-- Step 3 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="3">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>3</span>
+                    </span>
+                    <div class="label text-muted" style="font-size:14px;">Attachments</div>
+                </a>
+            </li>
+            {% else %}
+            <li class="form-stepper-active text-center form-stepper-list" step="1">
+                <a class="mx-2">
+                    <span class="form-stepper-circle">
+                        <span>1</span>
+                    </span>
+                    <div class="label" style="font-size:14px;">Petition details</div>
+                </a>
+            </li>
+            <!-- Step 2 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="2">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>2</span>
+                    </span>
+                    <div class="label text-muted" style="font-size:14px;">Petition terms</div>
+                </a>
+            </li>
+            <!-- Step 3 -->
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="3">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>3</span>
+                    </span>
+                    <div class="label text-muted" style="font-size:14px;">Attachments</div>
+                </a>
+            </li>
+
+            <li class="form-stepper-unfinished text-center form-stepper-list" step="4">
+                <a class="mx-2">
+                    <span class="form-stepper-circle text-muted">
+                        <span>4</span>
+                    </span>
+                    <div class="label text-muted" style="font-size:14px;">Profile</div>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <!-- Step Wise Form Content -->
+        <form id="userAccountSetupForm" name="userAccountSetupForm" data-request="onCreatePetition" data-request-files
+            enctype="multipart/form-data" method="POST">
+            <!-- Step 1 Content -->
+            {% if user %}
+            <section id="step-1" class="form-step">
+                <h2 class="font-normal">Petition details</h2>
+              
+        
+                <!-- Step 1 input fields -->
+              
+
+
+                <div class="mt-3">
+
+
+                    <div class="form-group">
+                        <label class="formField"><span class="formField-text" style="font-size: 18px;">Petition Title <span
+                                    class="mandatory">*</span></span>
+                            <span class="formField-validation"></span>
+                            <textarea class="form-control" id="title" aria-label="Petition title" name="title" style="height: 83px; width: 1058px;white-space: pre-wrap" required></textarea>
+                          </label>
+                    </div>
+                    <div class="form-group">
+
+                        <label class="formField"><span class="formField-text" style="font-size: 18px;">Intended Recipient <span
+                            class="mandatory">*</span></span><span class="formField-validation"></span>
+                    <textarea class="form-control" id="intended_to" aria-label="intended_to" type="text"
+                        name="intended_to" style="height: 43px; width: 1058px;white-space: pre-wrap" required></textarea>
+
+
+
+                    </div>
+                </div>
+                <div class="mt-3">
+
+
+
+                    <button class="accountButton  btn-navigate-form-step"
+                        style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="2">
+                        <img  style="height:22px;" src="{{ 'assets/images/next.png'|theme }}" />
+                        <span style="font-size: 16px;">Next</span></button>
+                    
+                </div>
+            </section>
+            <!-- Step 2 Content, default hidden on page load. -->
+            <section id="step-2" class="form-step d-none">
+                <h2 class="font-normal">Terms of your petition </h2>
+                <!-- Step 2 input fields -->
+                <div class="mt-3">
+                    
+                    <div class="form-group">
+                        <label for="textAreaField" style="color: #8F8579;font-size: 18px;" class="text-info">Description <span
+                                class="mandatory">*</span< /label><br>
+                                <p style="color: #8F8579;font-size: 18px;"> Explains the reason what the problem is and why you are
+                                    asking for change.&nbsp;</p>
+                                <textarea name="description" class="form-control" style="width:1058px" id="description" oninput="checkWordLimit()" rows="8" cols="81"
+                                    placeholder="indicate expected action from Parliament in response to the matters raised in the petition"
+                                    required></textarea>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#275937;color:#ffffff" type="button" step_number="1"><img  style="height:22px;" src="{{ 'assets/images/back.png'|theme }}" />
+                        <span style="font-size: 16px;">Prev</span></button>
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="3"><img  style="height:22px;" src="{{ 'assets/images/next.png'|theme }}" />
+                        <span style="font-size: 16px;">Next</span></button>
+                </div>
+            </section>
+
+            <section id="step-3" class="form-step d-none">
+                <h2 class="font-normal">Attachment of your petition </h2>
+                <!-- Step 2 input fields -->
+
+                <div class="mt-3">
+                    <fieldset>
+                        <label class="formFieldTitle" style="font-size: 18px;">Petition Attachment</label><span class="formField-validation"></span>
+                        <p style="font-size: 18px;"><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to
+                                understand. People are more likely to sign your petition if they understand why you are
+                                making the request.<br></em><br>
+                    </fieldset>
+                    <div class="form-group">
+                        <input type="file" class="form-control" name="doc_type" />
+
+                    </div>
+
+                </div>
+                <div class="mt-3">
+
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#275937;color:#ffffff" type="button" step_number="2"><img  style="height:22px;" src="{{ 'assets/images/next.png'|theme }}" />
+                        <span style="font-size: 16px;">Prev</span></button>
+                    <button class="accountButton submit-btn" style="background-color:#9e7c0c;color:#ffffff"
+                        type="submit"><img  style="height:22px;" src="{{ 'assets/images/save.png'|theme }}"/>
+                        <span style="font-size: 16px;">Save</span></button>
+                </div>
+            </section>
+
+            {% else %}
+
+
+            <section id="step-1" class="form-step">
+                <h2 class="font-normal">Petition details</h2>
+                <!-- Step 1 input fields -->
+              
+                
+
+                <div class="mt-3">
+
+                    <div class="form-group">
+                        <label class="formField"><span class="formField-text" style="font-size: 18px;">Petition Title <span
+                                    class="mandatory">*</span></span>
+                            <span class="formField-validation"></span>  
+                             <textarea class="form-control" id="title" aria-label="Petition title" name="title" style="height: 83px; width: 1058px;white-space: pre-wrap" required></textarea></label>
+                    </div>
+                    <div class="form-group">
+
+                        <label class="formField"><span class="formField-text" style="font-size: 18px;">Intended Recipient <span
+                                    class="mandatory">*</span></span><span class="formField-validation"></span>
+                            <textarea class="form-control" id="intended_to" aria-label="intended_to" type="text"
+                                name="intended_to" style="height: 43px; width: 1058px;white-space: pre-wrap" required></textarea>
+
+
+
+                    </div>
+                </div>
+                <div class="mt-3">
+
+
+
+                    <button class="accountButton btn-navigate-form-step" id="next-button"
+                        style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="2">
+                        <img  style="height:22px;" src="{{ 'assets/images/next.png'|theme }}" />
+                        <spam style="font-size: 16px;">Next</spam></button>
+                        
+                </div>
+            </section>
+            <!-- Step 2 Content, default hidden on page load. -->
+            <section id="step-2" class="form-step d-none">
+                <h2 class="font-normal">Terms of your petition </h2>
+                <!-- Step 2 input fields -->
+                <div class="mt-3">
+                    <div class="form-group">
+                        <label for="textAreaField" style="color: #8F8579; font-size: 18px;" class="text-info" >Description <span
+                                class="mandatory">*</span< /label><br>
+                                <p style="color: #8F8579;font-size: 18px;">Explains the reason what the problem is and why you are
+                                    asking for change.&nbsp;</p>
+                                <textarea name="description" class="form-control" style="width:1058px" id="description" oninput="checkWordLimit()" rows="8" cols="81"
+                                    placeholder="indicate expected action from Parliament in response to the matters raised in the petition"
+                                    required></textarea>
+									<p id="wordCount">Words remaining: 500</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#275937;color:#ffffff" type="button" step_number="1"><img  style="height:22px;" src="{{ 'assets/images/back.png'|theme }}"/>
+                        <spam style="font-size: 16px;">Prev</spam></button>
+                    <button class="accountButton btn-navigate-form-step" id="next-description"
+                        style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="3"> <img  style="height:22px;" src="{{ 'assets/images/next.png'|theme }}" />
+                        <spam style="font-size: 16px;">Next</spam></button>
+                       
+                </div>
+            </section>
+
+            <section id="step-3" class="form-step d-none">
+                <h2 class="font-normal">Attachment of your petition </h2>
+                <!-- Step 2 input fields -->
+
+                <div class="mt-3">
+                    <fieldset>
+                        <label class="formFieldTitle" style="font-size: 18px;">Petition Attachment</label><span class="formField-validation"></span>
+                        <p style="font-size: 18px;"><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to
+                                understand. People are more likely to sign your petition if they understand why you are
+                                making the request.<br></em><br>
+                    </fieldset>
+                    <div class="form-group">
+                        <input type="file" class="form-control" name="doc_type" />
+
+                    </div>
+
+                </div>
+                <div class="mt-3">
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#275937;color:#ffffff" type="button" step_number="2"><img  style="height:22px;" src="{{ 'assets/images/back.png'|theme }}"/>
+                        <spam style="font-size: 16px;">Prev</spam></button>
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#9e7c0c;color:#ffffff" type="button" step_number="4"><img  style="height:22px;" src="{{ 'assets/images/next.png'|theme }}" />
+                        <spam style="font-size: 16px;">Next</spam></button>
+                </div>
+            </section>
+
+            <!-- Step 3 Content, default hidden on page load. -->
+            <section id="step-4" class="form-step d-none">
+                <h2 class="font-normal">Please fill in your details – you are the Principal Petitioner</h2>
+                <!-- Step 3 input fields -->
+                <div class="mt-3">
+
+
+                    <div class="form-group">
+                        <label for="registerName" style="font-size: 18px;">Full Name</label>
+                        <input name="name" type="text" class="form-control" id="name" placeholder="Enter your full name"
+                            required />
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <div id="error"></div>
+                        <label for="registerID" style="font-size: 18px;">ID Number</label>
+                        <input name="id_number" type="text" class="form-control" placeholder="Enter ID Number"
+                            id="id_number" maxLength="13" required oninput="validateIDNumber(this)" />
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <label for="registerPhoneNumber" style="font-size: 18px;">Phone Number</label>
+                        <input name="phone_number" type="text" class="form-control" id="id_number" maxlength="10"
+                            placeholder="Enter Phone Number" required oninput="validatePhoneNumber(this)" />
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+                        <label for="registerProvince" style="font-size: 18px;">Province</label><br>
+                        <select id="province" name="province" class="form-control" onchange="updateMunicipalities()">
+                            <option value="">Select...</option>
+                            <option value="Eastern Cape">Eastern Cape</option>
+                            <option value="Free State">Free State</option>
+                            <option value="Gauteng">Gauteng</option>
+                            <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                            <option value="Limpopo">Limpopo</option>
+                            <option value="Mpumalanga">Mpumalanga</option>
+                            <option value="Northern Cape">Northern Cape</option>
+                            <option value="North West">North West</option>
+                            <option value="Western Cape">Western Cape</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerMunicipality" style="font-size: 18px;">Municipality</label>
+                        <select id="municipality" name="municipality" class="form-control">
+                            <option value="">Select...</option>
+                        </select>
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="registerEmail" style="font-size: 18px;">Email</label>
+                        <input name="email" type="email" class="form-control" id="email" placeholder="Enter your email"
+                            required />
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+                {% if user %}
+                <div class="mt-3" style="display:none">
+                    <button class="accountButton btn-navigate-form-step"
+                        style="background-color:#275937;color:#ffffff" type="button" step_number="3"><img  style="height:22px;" src="{{ 'assets/images/back.png'|theme }}"/>
+                        <spam style="font-size: 16px;">Prev</spam></button>
+                    <button class="accountButton submit-btn" style="background-color:#9e7c0c;color:#ffffff"
+                        type="submit"><img  style="height:22px;" src="{{ 'assets/images/save.png'|theme }}"/>
+                        <spam style="font-size: 16px;">Save</spam></button>
+                </div>
+
+                {% else %}
+                <div class="mt-3">
+                    <button class="accountButton btn-navigate-form-step" type="button"
+                        style="background-color:#275937;color:#ffffff" step_number="3"><img  style="height:22px;" src="{{ 'assets/images/back.png'|theme }}"/>
+                        <spam style="font-size: 16px;">Prev</spam></button>
+                    <button class="accountButton" 
+                        style="background-color:#9e7c0c;color:#ffffff" type="submit"><img  style="height:22px;" src="{{ 'assets/images/save.png'|theme }}"/>
+                        <spam style="font-size: 16px;">Save</spam></button>
+                </div>
+                {% endif%}
+
+            </section>
+            <br>
+            <br>
+        </form>
+    </div>
+</div>
+
+    <script>
+        function checkWordLimit() {
+            // Get the textarea element
+            var textarea = document.getElementById('description');
+
+            // Get the word count
+            var wordCount = textarea.value.trim().split(/\s+/).length;
+
+            // Set the maximum word limit
+            var maxWords = 500;
+
+            // Calculate words remaining
+            var wordsRemaining = maxWords - wordCount;
+
+            // Disable textarea if the word limit is exceeded
+            if (wordCount > maxWords) {
+                textarea.value = textarea.value.split(/\s+/).slice(0, maxWords).join(' ');
+                document.getElementById('wordCount').textContent = 'Words remaining: 0';
+                textarea.setAttribute('disabled', 'true');
+            } else {
+                // Update the word count display
+                document.getElementById('wordCount').textContent = 'Words remaining: ' + wordsRemaining;
+                textarea.removeAttribute('disabled');
+            }
+        }
+    </script>
+
+
+
+<script>
+    function validateIDNumber(input) {
+        var idNumber = input.value;
+        if (!/^\d{13}$/.test(idNumber)) {
+            // Invalid ID number, clear input value
+            input.setCustomValidity('ID number must be exactly 13 digits long and contain numbers only.');
+            return;
+        }
+        var year = parseInt(idNumber.substr(0, 2), 10);
+        var month = parseInt(idNumber.substr(2, 2), 10);
+        var day = parseInt(idNumber.substr(4, 2), 10);
+        if (year < 0 || year > 99 || month < 1 || month > 12 || day < 1 || day > 31) {
+            // Invalid ID number, clear input value
+            input.setCustomValidity('Please enter a valid South African ID number.');
+            return;
+        }
+        // Valid ID number, clear any validation error
+        input.setCustomValidity('');
+    }
+    
+    
+    </script>
+    
+    
+    <script>
+    function validatePhoneNumber(input) {
+        var phoneNumber = input.value;
+        // Remove any non-numeric characters from the input
+        phoneNumber = phoneNumber.replace(/\D/g, '');
+        // Check if the phone number is exactly 10 digits long
+        if (!/^\d{10}$/.test(phoneNumber)) {
+            // Invalid phone number, clear input value
+            input.setCustomValidity('Phone number must be exactly 10 digits long and contain numbers only.');
+            return;
+        }
+        // Valid phone number, clear any validation error
+        input.setCustomValidity('');
+    }
+    
+    
+    
+    </script>
+    
+
+    <script>
+
+const navigateToFormStep = (stepNumber) => {
+  document.querySelectorAll(".form-step").forEach((formStepElement) => {
+    formStepElement.classList.add("d-none");
+  });
+
+  document.querySelectorAll(".form-stepper-list").forEach((formStepHeader) => {
+    formStepHeader.classList.add("form-stepper-unfinished");
+    formStepHeader.classList.remove("form-stepper-active", "form-stepper-completed");
+  });
+
+  document.querySelector("#step-" + stepNumber).classList.remove("d-none");
+
+  const formStepCircle = document.querySelector('li[step="' + stepNumber + '"]');
+
+  formStepCircle.classList.remove("form-stepper-unfinished", "form-stepper-completed");
+  formStepCircle.classList.add("form-stepper-active");
+
+  for (let index = 0; index < stepNumber; index++) {
+    const formStepCircle = document.querySelector('li[step="' + index + '"]');
+    if (formStepCircle) {
+      formStepCircle.classList.remove("form-stepper-unfinished", "form-stepper-active");
+      formStepCircle.classList.add("form-stepper-completed");
+    }
+  }
+};
+
+document.querySelectorAll(".btn-navigate-form-step").forEach((formNavigationBtn) => {
+  formNavigationBtn.addEventListener("click", () => {
+    const stepNumber = parseInt(formNavigationBtn.getAttribute("step_number"));
+
+    const titleInput = document.getElementById('title');
+    const intendedtoInput = document.getElementById('intended_to');
+    
+
+    const titleinputField = document.querySelector("#step-" + (stepNumber - 1) + " #" + titleInput.id);
+    const intendedtoinputField = document.querySelector("#step-" + (stepNumber - 1) + " #" + intendedtoInput.id);
+  
+    if (titleinputField && intendedtoinputField.value.trim() === "") {
+      alert("Please enter a value for the input field before proceeding.");
+      return;
+    }
+  
+
+    navigateToFormStep(stepNumber);
+  });
+});
+
+
+</script>
+
+
+
+
+
+
+
+
+<script>
+    function updateMunicipalities() {
+        const provinceSelect = document.getElementById("province");
+        const municipalitySelect = document.getElementById("municipality");
+
+        // Clear existing options
+        municipalitySelect.innerHTML = '<option value="">Select...</option>';
+
+        // Populate options based on selected province
+        if (provinceSelect.value === "Eastern Cape") {
+            const municipalities = [
+                             
+        "Buffalo City Metropolitan",
+        "Nelson Mandela Bay Metropolitan",
+        "Matatiele Local",
+        "Ntabankulu Local",
+        "Umzimvubu Local",
+        "Winnie Madikizela-Mandela Local",
+        "Amahlathi Local",
+        "Great Kei Local",
+        "Mbhashe Local",
+        "Mnquma Local",
+        "Ngqushwa Local",
+        "Raymond Mhlaba Local",
+        "Dr AB Xuma Local",
+        "Emalahleni Local",
+        "Enoch Mgijima Local",
+        "Intsika Yethu Local",
+        "Inxuba Yethemba Local",
+        "Sakhisizwe Local",
+        "Elundini Local",
+        "Senqu Local",
+        "Walter Sisulu Local",
+        "Ingquza Hill Local",
+        "King Sabata Dalindyebo Local",
+       "Mhlontlo Local",
+        "Nyandeni Local",
+        "Port St Johns Local",
+        "Blue Crane Route Local",
+        "Dr Beyers Naudé Local",
+         "Kouga Local",
+         "Koukamma Local",
+        "Makana Local",
+        "Ndlambe Local",
+        "Sundays River Valley Local",
+
+
+
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+        } 
+      
+      else  if (provinceSelect.value === "Free State") {
+            const municipalities = [
+                             
+        "Mafube Local",
+        "Metsimaholo Local",
+        "Moqhaka Local",
+        "Ngwathe Local",
+        "Masilonyana Local",
+        "Matjhabeng Local",
+        "Nala Local",
+        "Tokologo Local",
+        "Tswelopele Local",
+        "Dihlabeng Local",
+        "Maluti-A-Phofung Local",
+        "Mantsopa Local",
+        "Nketoana Local",
+        "Phumelela Local",
+        "Setsoto Local",
+        "Kopanong Local",
+        "Letsemeng Local",
+        "Mohokare Local",
+
+
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+        } else if(provinceSelect.value === "Gauteng"){
+            const municipalities = [
+                "City of Ekurhuleni Metropolitan",
+                "City of Johannesburg Metropolitan",
+                "City of Tshwane Metropolitan",
+                "Emfuleni Local",
+                "Lesedi Local",
+                "Midvaal Local",
+                "Merafong City Local",
+                "Mogale City Local",
+                "Rand West City Local"
+                // Add more options here
+            ];
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        } else if(provinceSelect.value === "KwaZulu-Natal"){
+            const municipalities = [
+                "eThekwini Metropolitan",
+                "Dannhauser Local",
+                "eMadlangeni Local",
+                "Newcastle Local",
+                "Dr Nkosazana Dlamini Zuma Local",
+                "Greater Kokstad Local",
+                "Ubuhlebezwe Local",
+                "Umzimkhulu Local",
+                "KwaDukuza Local",
+                "Mandeni Local",
+                "Maphumulo Local",
+                "Ndwedwe Local",
+                "City of uMhlathuze Local",
+                "Mthonjaneni Local",
+                "Nkandla Local",
+                "uMfolozi Local",
+                "uMlalazi Local",
+                "Ray Nkonyeni Local",
+                "Umdoni Local",
+                "Umuziwabantu Local",
+                "Umzumbe Local",
+                "Impendle Local",
+                "Mkhambathini Local",
+                "Mpofana Local",
+                "Msunduzi Local",
+                "Richmond Local",
+                "uMngeni Local",
+                "uMshwathi Local",
+                "Big 5 Hlabisa Local",
+                "Jozini Local",
+                "Mtubatuba Local",
+                "uMhlabuyalingana Local",
+                "Endumeni Local",
+                "Nquthu Local",
+                "uMsinga Local",
+                "Umvoti Local",
+                "Alfred Duma Local",
+                "Inkosi Langalibalele Local",
+                "Okhahlamba Local",
+                "AbaQulusi Local",
+                "eDumbe Local",
+                "Nongoma Local",
+                "Ulundi Local",
+                "uPhongolo Local"
+               
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        } else if(provinceSelect.value === "Limpopo"){
+            const municipalities = [
+                "Blouberg Local",
+                "Lepelle-Nkumpi Local",
+                "Molemole Local",
+                "Polokwane Local",
+                "Ba-Phalaborwa Local",
+                "Greater Giyani Local",
+                "Greater Letaba Local",
+                "Greater Tzaneen Local",
+                "Maruleng Local",
+                "Elias Motsoaledi Local",
+                "Ephraim Mogale Local",
+                "Fetakgomo Tubatse Local",
+                "Makhuduthamaga Local",
+                "Collins Chabane Local",
+                "Makhado Local",
+                "Musina Local",
+                "Thulamela Local",
+                "Bela-Bela Local",
+                "Lephalale Local",
+                "Modimolle-Mookgophong Local",
+                "Mogalakwena Local",
+                "Thabazimbi Local"
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        } else if(provinceSelect.value === "Mpumalanga"){
+            const municipalities = [
+                "Bushbuckridge Local",
+                "City of Mbombela Local",
+                "Nkomazi Local",
+                "Thaba Chweu Local",
+                "Chief Albert Luthuli Local",
+                "Dipaleseng Local",
+                "Dr Pixley Ka Isaka Seme Local",
+                "Govan Mbeki Local",
+                "Lekwa Local",
+                "Mkhondo Local",
+                "Msukaligwa Local",
+                "Dr JS Moroka Local",
+                "Emakhazeni Local",
+                "Emalahleni Local",
+                "Steve Tshwete Local",
+                "Thembisile Hani Local",
+                "Victor Khanye Local"
+                
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        }
+   else if(provinceSelect.value === "Northern Cape"){
+            const municipalities = [
+                "Dikgatlong Local",
+                "Magareng Local",
+                "Phokwane Local",
+                "Sol Plaatje Local",
+                "Ga-Segonyana Local",
+                "Gamagara Local",
+                "Joe Morolong Local",
+                "Hantam Local",
+                "Kamiesberg Local",
+                "Karoo Hoogland Local",
+                "Khai-Ma Local",
+                "Nama Khoi Local",
+                "Richtersveld Local",
+                "Emthanjeni Local",
+                "Kareeberg Local",
+                "Renosterberg Local",
+                "Siyancuma Local",
+                "Siyathemba Local",
+                "Thembelihle Local",
+                "Ubuntu Local",
+                "Umsobomvu Local",
+                "!Kheis Local",
+                "Dawid Kruiper Local",
+                "Kai !Garib Local",
+                "Kgatelopele Local",
+                "Tsantsabane Local",
+
+
+
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        }
+        else if(provinceSelect.value === "North West"){
+            const municipalities = [
+                "Kgetlengrivier Local",
+                "Madibeng Local",
+                "Moretele Local",
+                "Moses Kotane Local",
+                "Rustenburg Local",
+                "City of Matlosana Local",
+                "JB Marks Local",
+                "Maquassi Hills Local",
+                "Greater Taung Local",
+                "Kagisano-Molopo Local",
+                "Lekwa-Teemane Local",
+                "Mamusa Local",
+                "Naledi Local",
+                "Ditsobotla Local",
+                "Mahikeng Local",
+                "Ramotshere Moiloa Local",
+                "Ratlou Local",
+                "Tswaing Local",
+                
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        }else if(provinceSelect.value === "Western Cape"){
+            const municipalities = [
+                "City of Cape Town Metropolitan",
+                "Breede Valley Local",
+                "Drakenstein Local",
+                "Langeberg Local",
+                "Stellenbosch Local",
+                "Witzenberg Local",
+                "Beaufort West Local",
+                "Laingsburg Local",
+                "Prince Albert Local",
+                "Bitou Local",
+                "George Local",
+                "Hessequa Local",
+                "Kannaland Local",
+                "Knysna Local",
+                "Mossel Bay Local",
+                "Oudtshoorn Local",
+                "Cape Agulhas Local",
+                "Overstrand Local",
+                "Swellendam Local",
+                "Theewaterskloof Local",
+                "Bergrivier Local",
+                "Cederberg Local",
+                "Matzikama Local",
+                "Saldanha Bay Local",
+                "Swartland Local"
+                
+                // Add more options here
+            ];
+
+            municipalities.forEach(municipality => {
+                const option = document.createElement("option");
+                option.text = municipality;
+                option.value = municipality;
+                municipalitySelect.add(option);
+            });
+
+        }
+    }
+</script>
+
+
+
+<script>
+function isNumeric(input) {
+  return /^[0-9]+$/.test(input);
+}
+
+const inputField = document.getElementById("id_number");
+
+
+inputField.addEventListener("blur", function(event) {
+  const input = event.target.value;
+  if (!isNumeric(input)) {
+    alert("Please enter a valid numeric value.");
+    inputField.value = ""; // Clear the input field
+    
+  }
+});
+</script>
+
+
+
+
+<script>
+const nextButton = document.querySelector('.next-button');
+const requiredInputs = document.querySelectorAll('.required-input');
+
+nextButton.addEventListener('click', function(event) {
+  let inputsFilled = true;
+  
+  requiredInputs.forEach(function(input) {
+    if (!input.value) {
+      inputsFilled = false;
+      input.classList.add('error');
+    } else {
+      input.classList.remove('error');
+    }
+  });
+  
+  if (!inputsFilled) {
+    event.preventDefault();
+    alert('Please fill out all required fields before continuing.');
+  }
+});
+
+
+</script>
+
+
+
+
+<style>
+.accountButton {
+    border: none;
+    border-radius: 0px;
+    color: whitesmoke;
+    height: 40px;
+    width: 250px;
+    background-color: #9e7c0c !important;
+    color: white !important;
+    padding-left: 40px !important;
+    text-align: left !important;
+    margin: 10px;
+    padding-top: 3px;
+    border-radius: 20px;
+    background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+}
+
+button {
+    background-image: linear-gradient(to right, #9e7c0c , #9e7c0c);
+    background-color: #9e7c0c !important;
+    color: white;
+    border-radius: 20px;
+    border: none;
+    height: 40px;
+}
+
+
+textarea.form-control {
+    height: auto;
+    width: 100%;
+}   
+.mandatory{
+    color:red;
+    font-size:12px;
+}
+
+h1 {
+    text-align: center;
+}
+h2 {
+  
+    margin: 0;
+}
+#multi-step-form-container {
+    margin-top: 5rem;
+}
+.text-center {
+    text-align: center;
+}
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+.pl-0 {
+    padding-left: 0;
+}
+.button {
+    padding: 0.7rem 1.5rem;
+    border: 1px solid  #275937 !important;
+    background-color:  #275937 !important;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.submit-btn {
+    border: 1px solid #0e9594;
+    background-color: #0e9594;
+}
+.mt-3 {
+    margin-top: 2rem;
+}
+.d-none {
+    display: none;
+}
+.form-step {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 3rem;
+}
+.font-normal {
+    font-weight: normal;
+}
+ul.form-stepper {
+    counter-reset: section;
+    margin-bottom: 3rem;
+}
+ul.form-stepper .form-stepper-circle {
+    position: relative;
+}
+ul.form-stepper .form-stepper-circle span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+}
+.form-stepper-horizontal {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+ul.form-stepper > li:not(:last-of-type) {
+    margin-bottom: 0.625rem;
+    -webkit-transition: margin-bottom 0.4s;
+    -o-transition: margin-bottom 0.4s;
+    transition: margin-bottom 0.4s;
+}
+.form-stepper-horizontal > li:not(:last-of-type) {
+    margin-bottom: 0 !important;
+}
+.form-stepper-horizontal li {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: start;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+}
+.form-stepper-horizontal li:not(:last-child):after {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    height: 1px;
+    content: "";
+    top: 32%;
+}
+.form-stepper-horizontal li:after {
+    background-color: #dee2e6;
+}
+.form-stepper-horizontal li.form-stepper-completed:after {
+    background-color:  #275937 !important;
+}
+.form-stepper-horizontal li:last-child {
+    flex: unset;
+}
+ul.form-stepper li a .form-stepper-circle {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin-right: 0;
+    line-height: 1.7rem;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.38);
+    border-radius: 50%;
+}
+.form-stepper .form-stepper-active .form-stepper-circle {
+    background-color: #9e7c0c !important;
+    color: #fff;
+}
+.form-stepper .form-stepper-active .label {
+    color: #B3995D !important;
+}
+.form-stepper .form-stepper-active .form-stepper-circle:hover {
+    background-color: #9e7c0c !important;
+    color: #fff !important;
+}
+.form-stepper .form-stepper-unfinished .form-stepper-circle {
+    background-color: #f8f7ff;
+}
+.form-stepper .form-stepper-completed .form-stepper-circle {
+    background-color: #275937 !important;
+    color: #fff;
+}
+.form-stepper .form-stepper-completed .label {
+    color: #275937 !important;
+}
+
+.form-stepper .form-stepper-completed:not(:last-child) .label {
+    color: #275937 !important;
+}
+
+
+.form-stepper .form-stepper-completed .form-stepper-circle:hover {
+    background-color: #Efeade !important;
+    color: #fff !important;
+}
+.form-stepper .form-stepper-active span.text-muted {
+    color: #fff !important;
+}
+.form-stepper .form-stepper-completed span.text-muted {
+    color: #fff !important;
+}
+.form-stepper .label {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+.form-stepper a {
+    cursor: default;
+}
+.form-stepper-horizontal .form-stepper-list .text-muted, 
+.form-stepper-horizontal .form-stepper-list .label {
+  color: #9e7c0c !important;;
+}
+
+</style>

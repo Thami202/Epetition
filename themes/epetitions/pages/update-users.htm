@@ -1,0 +1,74 @@
+url = "/users/:id"
+layout = "default"
+title = "Update users"
+==
+<?php
+use Rainlab\User\Models\User;
+use Carbon\Carbon;
+
+function onStart()
+{
+  $id =$this->param('id');
+  $this['user'] =User::find($id);
+
+}
+
+function onUpdate()
+{
+    $currentTime = Carbon::now();
+   $user =User::find($this->param('id'));
+  $user->name =post('name');
+  $user->email =post('email');
+  $user->is_activated ='1';
+  $user->activated_at =$currentTime ;
+  // $user->password = post('password');
+    //update parameters
+  
+  
+
+    $user->save();
+
+    return Redirect('/usermanagement');
+}
+?>
+==
+<h4>Update User</h4>
+
+<form data-request="onUpdate">
+
+{{ form_token()}}
+
+
+
+{{ form_sessionKey()}}
+
+
+
+<div class ="form-group">
+
+<lable for ="name">Name</lable>
+
+<input type ="text" name="name" class ="form-control" value="{{user.name}}"/>
+
+</div>
+
+<div class ="form-group">
+
+    <lable for ="email">Email</lable>
+
+    <input type ="email" name="email" class ="form-control" value="{{user.email}}"/>
+
+</div>
+
+<!--<div class ="form-group">
+
+    <lable for ="email">Password</lable>
+
+    <input type ="password" name="password" class ="form-control" value="{{user.password}}"/>
+
+</div>-->
+
+    <input type ="submit" class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;" name ="submit" value="Save" />
+
+</form>
+<br>

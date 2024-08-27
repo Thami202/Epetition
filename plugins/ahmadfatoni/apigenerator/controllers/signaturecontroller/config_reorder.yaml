@@ -1,0 +1,4 @@
+title: Signature
+modelClass: AhmadFatoni\ApiGenerator\Models\Signature
+toolbar:
+    buttons: reorder_toolbar

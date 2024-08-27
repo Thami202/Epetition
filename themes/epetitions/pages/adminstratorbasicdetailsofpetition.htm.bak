@@ -1,0 +1,242 @@
+title = "adminstratorbasicdetailsofpetition"
+url = "/adminstratorbasicdetailsofpetition/:id/"
+layout = "adminstrator"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+function onStart()
+{
+    $this->addJs('assets/mine/a076d05399.js');
+
+    try {
+        // Retrieve the petition with the specified ID for a specific user
+        $userId = 117;
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/' . $this->param('id') . '/petition');
+        $petitionData = json_decode($response);
+
+        if (!empty($petitionData->petition)) {
+            // Retrieve the signature count for the selected petition
+            $signatureResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/' . $petitionData->petition->id . '/signature-count');
+            $signatureCountData = json_decode($signatureResponse);
+
+            // Check if the signature count data is valid
+            if ($signatureCountData && isset($signatureCountData->count)) {
+                $petitionData->petition->signature_count = $signatureCountData->count;
+            } else {
+                $petitionData->petition->signature_count = 0;
+            }
+
+            // Assign the modified petition data to the view
+            $this['petition'] = $petitionData->petition;
+
+            // Retrieve the associated document/file for the petition
+            $documentResponse = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/' . $petitionData->petition->id . '/document');
+            $documentData = json_decode($documentResponse);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('JSON decoding error: ' . json_last_error_msg());
+            }
+
+            // Check if the document data is valid
+            if ($documentData && isset($documentData->attachments[0])) {
+                $attachment = $documentData->attachments[0];
+                $this['fileHandle'] = (object)[
+                    'file_name' => $attachment->file_name,
+                    'disk_name' => $attachment->disk_name,
+                    'contentType' => $attachment->content_type,
+                    'file_path' => $attachment->path, // Assuming path contains the file URL
+                ];
+            } else {
+                $this['fileHandle'] = null;
+            }
+        } else {
+            // Handle the case where no petition data is found
+            $this['petition'] = null;
+            $this['fileHandle'] = null;
+            $this['signatures'] = [];
+        }
+    } catch (\Exception $e) {
+        // Handle exceptions
+        $this['petition'] = null;
+        $this['fileHandle'] = null;
+        $this['signatures'] = [];
+    }
+}
+?>
+==
+<!DOCTYPE html>
+
+<br>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+WyDHViF9PfNnEIlbbjCZPQGm2Fg1NK49M" crossorigin="anonymous">
+ 
+ <style>
+.modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    .close-btn {
+      cursor: pointer;
+      color: #333;
+      float: right;
+      font-size: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      margin-right: 10px;
+    }
+    </style>
+ 
+ 
+</head>
+<body>
+
+<!-- Petition Details Table -->
+<div class="row">
+  <div class="col-lg-12">
+  
+    
+   
+            <button class="btn btn-info">Status:{{petition.status_id}}</button>
+            <button class="btn btn-success">Approve Petition</button>
+            <button class="btn btn-warning" onclick="openFeedbackModal()">Feedback</button>
+            <button class="btn btn-info">Forward Petition</button>
+            <button class="btn btn-danger">Reject Petition</button>
+          
+    <h2>Petition Details</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Intended To</th>
+          <th>Description</th>
+          <th>Name</th>
+          <th>ID Number</th>
+          <th>Phone Number</th>
+          <th>Province</th>
+          <th>Municipality</th>
+          <th>Email</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+    <!-- Use your backend logic to populate the rows -->
+    <tr>
+
+        <td>{{ petition.title }}</td>
+        <td>{{ petition.intended_to }}</td>
+        <td>{{ petition.description }}</td>
+		
+        <td>{{petition.user.name }}</td>
+        <td>{{ petition.user.profile.id_number }}</td>
+        <td>{{ petition.user.phone_number }}</td>
+        <td>{{ petition.user.province }}</td>
+        <td>{{ petition.user.municipality }}</td>
+        <td>{{ petition.user.email }}</td>
+            
+            
+    </tr>
+    <!-- Add more rows as needed -->
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Attachment Table -->
+<div class="row">
+  <div class="col-lg-12">
+    <h2>Attachment Details</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Attachment</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            {% if fileHandle %}
+              <strong>Filename:</strong> {{ fileHandle.file_name }}<br>
+              <strong>File Size:</strong> {{ fileHandle.disk_name }}<br>
+              <strong>Content Type:</strong> {{ fileHandle.contentType }}<br>
+              <strong>File Path:</strong> {{ fileHandle.file_path }}<br>
+             <a href="{{ fileHandle.file_path }}" download="{{ fileHandle.file_name }}" onclick="console.log('Download link clicked');">
+              Download File
+             </a>
+            {% else %}
+              No attachment found.
+            {% endif %}
+          </td>
+          <td>
+            <button class="btn btn-success">Approve</button>
+            <button class="btn btn-danger">Reject</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal for Feedback -->
+<div class="modal" id="feedbackModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeFeedbackModal()">&times;</span>
+    <p>Give feedback about petition  to the applicant</p>
+    <textarea id="feedbackTextarea" placeholder="Enter your feedback..."></textarea>
+    <button class="btn btn-primary" onclick="submitFeedback()">Submit</button>
+    <button class="btn btn-secondary" onclick="closeFeedbackModal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+  function openFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'flex';
+  }
+
+  function closeFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'none';
+  }
+
+  function submitFeedback() {
+    // Implement your logic to handle the submitted feedback here
+    // For example, you can get the feedback content from the textarea
+    var feedbackContent = document.getElementById('feedbackTextarea').value;
+    console.log('Feedback submitted:', feedbackContent);
+
+    // Close the modal after submission (you can modify this based on your logic)
+    closeFeedbackModal();
+  }
+</script>
+
+</body>
+</html>

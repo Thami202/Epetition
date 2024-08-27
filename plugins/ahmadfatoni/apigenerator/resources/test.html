@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+  $(function() {
+
+    function Validate() {
+        // first clear any left over error messages
+        $('#error p').remove();
+
+        // store the error div, to save typing
+        var error = $('#error');
+
+        var idNumber = $('#id_number').val();
+
+
+        // assume everything is correct and if it later turns out not to be, just set this to false
+        var correct = true;
+
+        //Ref: http://www.sadev.co.za/content/what-south-african-id-number-made
+        // SA ID Number have to be 13 digits, so check the length
+        if (idNumber.length != 13 || !isNumber(idNumber)) {
+            error.append('<p>ID number does not appear to be authentic - input not a valid number</p>');
+            correct = false;
+        }
+
+        // get first 6 digits as a valid date
+        var tempDate = new Date(idNumber.substring(0, 2), idNumber.substring(2, 4) - 1, idNumber.substring(4, 6));
+
+        var id_date = tempDate.getDate();
+        var id_month = tempDate.getMonth();
+        var id_year = tempDate.getFullYear();
+
+        var fullDate = id_date + "-" + id_month + 1 + "-" + id_year;
+
+        if (!((tempDate.getYear() == idNumber.substring(0, 2)) && (id_month == idNumber.substring(2, 4) - 1) && (id_date == idNumber.substring(4, 6)))) {
+            error.append('<p>ID number does not appear to be authentic - date part not valid</p>');
+            correct = false;
+        }
+
+        // get the gender
+        var genderCode = idNumber.substring(6, 10);
+        var gender = parseInt(genderCode) < 5000 ? "Female" : "Male";
+
+        // get country ID for citzenship
+        var citzenship = parseInt(idNumber.substring(10, 11)) == 0 ? "Yes" : "No";
+
+        // apply Luhn formula for check-digits
+        var tempTotal = 0;
+        var checkSum = 0;
+        var multiplier = 1;
+        for (var i = 0; i < 13; ++i) {
+            tempTotal = parseInt(idNumber.charAt(i)) * multiplier;
+            if (tempTotal > 9) {
+                tempTotal = parseInt(tempTotal.toString().charAt(0)) + parseInt(tempTotal.toString().charAt(1));
+            }
+            checkSum = checkSum + tempTotal;
+            multiplier = (multiplier % 2 == 0) ? 1 : 2;
+        }
+        if ((checkSum % 10) != 0) {
+            error.append('<p>ID number does not appear to be authentic - check digit is not valid</p>');
+            correct = false;
+        };
+
+
+        // if no error found, hide the error message
+        if (correct) {
+            error.css('display', 'none');
+
+            // clear the result div
+            $('#result').empty();
+            // and put together a result message
+            $('#result').append('<p>South African ID Number:   ' + idNumber + '</p><p>Birth Date:   ' + fullDate + '</p><p>Gender:  ' + gender + '</p><p>SA Citizen:  ' + citzenship + '</p>');
+        }
+        // otherwise, show the error
+        else {
+            error.css('display', 'block');
+        }
+
+        return false;
+    }
+
+    function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    $('#idCheck').submit(Validate);
+  });
+</script>
+
+
+
+<script>
+    var values = [
+        ["Buffalo City Metropolitan", "Nelson Mandela Bay Metropolitan", "Matatiele Local", "Ntabankulu Local", "Umzimvubu Local"],
+        ["Mangaung Metropolitan", "Mafube Local", "Metsimaholo Local", "Moqhaka Local", "Ngwathe Local"],
+       
+    ];
+
+    function updateSelectField() {
+        var selectField1 = document.getElementById("select-field1");
+        var selectField2 = document.getElementById("select-field2");
+        var selectedIndex = selectField1.value;
+
+        selectField2.innerHTML = "";
+
+        for (var i = 0; i < values[selectedIndex].length; i++) {
+            var option = document.createElement("option");
+            option.value = i;
+            option.text = values[selectedIndex][i];
+
+            selectField2.appendChild(option);
+        }
+    }
+</script>
+
+
+<script type="text/javascript">
+  $('#error_message').html('');
+
+
+if(document.getElementById('title').value==='')
+ {
+     $("#error_title").html("Please enter title of your petition.");
+        focusSet = true;
+}else{
+    $("#error_title").html("");
+    focusSet = false;
+  }
+if(document.getElementById('intended_to').value==='')
+ {
+    $("#error_intended_to").html("Pleas  enter intended recipient of the petition.");
+     focusSet = true;
+}else{
+     $("#error_intended_to").html('');
+    focusSet = false;
+    }
+
+    if(document.getElementById('description').value==='')
+ {
+    $("#error_description").html("Pleas  enter description of the petition.");
+     focusSet = true;
+}else{
+     $("#error_description").html('');
+    focusSet = false;
+    }
+
+    if(document.getElementById('name').value==='')
+ {
+    $("#error_name").html("Pleas  enter your full name.");
+     focusSet = true;
+}else{
+     $("#error_name").html('');
+    focusSet = false;
+    }
+    if(document.getElementById('id_number').value==='')
+    {
+     if ($("#id_number").parent().next(".validation").length == 0)
+        {
+            $("#id_number").parent().after("<div class='validation error-display'>Please enter ID number.</div>");
+         }
+          focusSet = true;
+     }else{
+         $("#id_number").parent().next(".validation").remove(); // remove it
+        focusSet = false;
+     }  
+
+     if(document.getElementById('phone_number').value==='')
+     {
+        $('#error_phone_number').html('Please enter phone_number');
+             focusSet = true;
+        }else{
+         $("#error_phone_number").html('');
+            focusSet = false;
+        } 
+
+        if(document.getElementById('province').value=='-1')
+        {
+            $('#error_province').html('Please select province.');
+                focusSet = true;
+         }else{
+            $('#error_province').html('');
+            focusSet = false;
+         }  
+
+         if(document.getElementById('municipality').value=='-1')
+        {
+            $('#error_municipality').html('Please select municipality.');
+                focusSet = true;
+         }else{
+            $('#error_municipality').html('');
+            focusSet = false;
+         }  
+
+
+ if(document.getElementById('email').value==='')
+    {
+    if ($("#email").parent().next(".validation").length == 0)
+    {
+     $("#email").parent().after("<div class='validation error-display'>Please enter Email.</div>");
+    }
+                        focusSet = true;
+                    }else{
+                        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                        if(!re.test(String($('#email').val()).toLowerCase()))
+                        {
+                             $("#email").parent().next(".validation").remove(); // remove it
+                            if ($("#email").parent().next(".validation").length == 0)
+                            {
+                             $("#email").parent().after("<div class='validation error-display'>Invalid Email.</div>");
+                            }
+                            focusSet = true;
+                        }else{
+                            $("#email").parent().next(".validation").remove(); // remove it
+                            focusSet = false;
+                        }
+                    }
+
+                
+
+
+</script>
+
+
+<style>
+.error-display_2{
+  margin: -30px 0px 20px 0px;
+  width: 100%;
+  padding-left: 17px;
+   color: red;
+    background-color: #000;
+    border-block-color: #fff solid 11px;
+   
+    font-style: italic;
+}
+.progressBar-step-active:before {
+       left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    background-color: #4275ae;
+}
+
+
+.progressBar-step-active
+{
+      color: #4275ae;
+}
+
+ .progressBar-step {
+    position: relative;
+    padding-top: 20px;
+    color: green;
+    text-indent: -9999px;
+    border: none;
+    /*background-color: transparent;*/
+    outline: none;
+    display: inline-block;
+    font-size: 1.06667rem;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
+form .row .row {
+    margin: 0 -0.53333rem;
+}
+
+.row .row {
+    margin: 0 -1rem;
+    max-width: none;
+    width: auto;
+}
+
+
+.petitionSectionTitle {
+    margin-bottom: 1rem;
+}
+
+.progressBar-step {
+    text-indent: 0;
+}
+
+
+.progressBar-step:before {
+    position: absolute;
+    top: 0;
+    display: block;
+    width: 15px;
+    height: 15px;
+    content: "";
+    border: 2px solid #4275ae;
+    border-radius: 50%;
+   // background-color: #fff;
+    box-sizing: border-box;
+    z-index: 3;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+.progressBar-step:first-child:after {
+    display: none;
+}
+
+.progressBar-step:after {
+    position: absolute;
+    top: 5px;
+    left: calc(-50% - 6.5px);
+    display: block;
+    width: 100%;
+    height: 2px;
+    content: "";
+    background-color: #4275ae;
+    z-index: 1;
+}
+
+.progressBar-step:after {
+    position: absolute;
+    top: 5px;
+    left: calc(-50% - 6.5px);
+    display: block;
+    width: 100%;
+    height: 2px;
+    content: "";
+    background-color: #4275ae;
+    z-index: 1;
+}
+.progressBar-smalltext {
+    color: #4275ae;
+    font-size: 1.06667rem;
+    font-weight: bold;
+    margin-left: 1.5rem;
+}
+
+.fieldset {
+    background: #f3f3f3;
+    border-radius: 4px;
+}
+.fieldset {
+    border: 1px solid #ddd;
+    margin: 1.2rem 0;
+    padding: 1.33333rem;
+}
+
+
+</style>
+
+
+<style>
+.progress-container {
+  width: 100%;
+  height: 30px;
+  background-color: lightgray;
+}
+
+ .step.hidden {
+        visibility: hidden;
+      }
+
+.progress-bar {
+  height: 100%;
+  background-color: green;
+  width: 0%;
+  transition: width 0.25s;
+}
+
+.step-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.step {
+  width: 33.33%;
+  text-align: center;
+}
+
+.step#step1 {
+  background-color: lightgray;
+}
+
+.step.active {
+  background-color: green;
+  font-weight: bold;
+}
+</style>
+
+
+<script>
+const steps = document.querySelectorAll('.step');
+const backBtn = document.querySelector('#backBtn');
+const nextBtn = document.querySelector('#nextBtn');
+let currentStep = 0;
+
+steps[currentStep].classList.add('active');
+updateProgressBar();
+
+backBtn.addEventListener('click', () => {
+  steps[currentStep].classList.remove('active');
+  currentStep--;
+  steps[currentStep].classList.add('active');
+  updateProgressBar();
+});
+
+nextBtn.addEventListener('click', () => {
+  steps[currentStep].classList.remove('active');
+  steps[currentStep].classList.add('completed');
+  currentStep++;
+  steps[currentStep].classList.add('active');
+  updateProgressBar();
+});
+
+function updateProgressBar() {
+  const progressBar = document.querySelector('#myBar');
+  progressBar.style.width = `${(currentStep + 1) * (100 / steps.length)}%`;
+}
+
+
+ var i, items = $('.nav-link'), pane = $('.tab-pane');
+            var focusSet = false;
+            // next
+            $('.nexttab').on('click', function(){
+                var tab ="";
+                for(i = 0; i < items.length; i++){
+                    if($(items[i]).hasClass('active') == true){
+                        tab = i;
+                        break;
+                }
+        }
+
+
+
+</script>
+
+<script>
+// Get the form and the steps
+var myForm = document.getElementById("myForm");
+var steps = myForm.querySelectorAll("div");
+
+// Get the next and previous buttons for each step
+var nextBtns = myForm.querySelectorAll("button[type='button']");
+var prevBtns = myForm.querySelectorAll("button[type='button']");
+
+// Add click event listeners to the next buttons
+for (var i = 0; i < nextBtns.length; i++) {
+  nextBtns[i].addEventListener("click", function() {
+    // Get the current step
+    var currentStep = this.parentNode;
+    // Get the next step
+    var nextStep = currentStep.nextElementSibling;
+    // Show the next step
+    nextStep.style.display = "block";
+    // Hide the current step
+    currentStep.style.display = "none";
+  });
+}
+
+// Add click event listeners to the previous buttons
+for (var i = 0; i < prevBtns.length; i++) {
+  prevBtns[i].addEventListener("click", function() {
+    // Get the current step
+    var currentStep = this.parentNode;
+    // Get the previous step
+    var prevStep = currentStep.previousElementSibling;
+    // Show the previous step
+    prevStep.style.display = "block";
+    // Hide the current step
+    currentStep.style.display = "none";
+  });
+}
+
+
+</script>
+
+
+</head>
+
+<body>
+<div class="columns large-9 padding-left">
+<div>
+<div>
+</div>
+<h2 class="petitionSectionTitle">Request a new e-petition </h2>
+<div style ="margin-bottom: 2rem;" class="progressBar" style="background-color: #4275ae;">
+<div class="tab-pane row active">
+<div style ="display: grid;grid-template-columns: repeat(auto-fit, minmax(0, 1fr));"  class="progressBar-container">
+<div  class="nav-link progressBar-step progressBar-step-active" {% if current==2 %} style='font-weight: bold;' {% endif %} >
+1. Petition details
+</div>
+<div class="nav-link progressBar-step "  {% if current==2 %} style='font-weight: bold;' {% endif %}>
+
+2. Petition terms
+
+</div>
+
+<div class="nav-link progressBar-step "  {% if current==2 %} style='font-weight: bold;' {% endif %}>
+3. Attachments
+
+</div>
+<div class="nav-link progressBar-step">
+4. Your details</div>
+
+</div>
+<div class="show-for-small-only"><p class="progressBar-smalltext">Step 1. Petition details</p>
+</div>
+</div>
+</div>
+
+<form   id="idCheck" data-request="onCreatePetition" data-request-files>
+  <h3 class="form petitionSecondaryTitle">Please fill in the details of your petition</h3>
+
+  {% if user %}
+ 
+  <fieldset><span class="formField-description">
+<h5 class="formFieldTitle">Petition details</h5>
+<div class="row" id="step1" >
+
+<div class="form-group" >
+    
+	<label class="formField"><span class="formField-text">Petition Title <span class="mandatory">*</span></span>
+<span class="formField-validation"></span>
+<input class="form-control" id="title" aria-label="Petition title" type="text" name="title" required></label>
+
+</div>
+<p><strong><em>Tip:</em></strong>&nbsp;&nbsp;<em>The petition title is a summary of your petition request and the first part of the petition that people will see. Keep it short and to the point.</em><br><br>
+<div class="form-group"><label class="formField"><span class="formField-text">Intended to recipient of the petition<span class="mandatory">*</span></span><span class="formField-validation"></span>
+<input class="form-control" id="intended_to" aria-label="intended_to" type="text" name="intended_to" required></label><p>Words directed to where the petition is going to.</p></fieldset>
+
+ 
+<button type="button"  id="next1" style="background-color:#9e7c0c;color:#ffffff" class=" btn btn-default">Next</button>
+</div>
+</div>
+<br>
+<div class="row" id ="step2"  >
+   <h3>Terms of your petition </h3>
+
+  <fieldset><h5 class="formFieldTitle">Petition terms</h5><span class="formField-validation"></span><p><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to understand. People are more likely to sign your petition if they understand why you are making the request.<br></em><br>
+</fieldset>
+
+<div class="form-group" >
+    <label for="textAreaField" style="color:black;" class="text-info">Description <span class="mandatory">*</span</label><br> 
+    <p>The reason explains what the problem is and why you are asking for change.&nbsp;</p>
+     <textarea name="description" class="form-control" id="description" rows="4"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition" required></textarea> 
+    </div>
+    <button type="button" id="prev2" style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Prev</button>
+<button type="button"id="next2" style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Next</button>
+</div>
+
+
+<div class="row" id="step3"  >
+<h3>Attachment of your petition </h3>
+ <fieldset><h5 class="formFieldTitle">Petition Attachment</h5><span class="formField-validation"></span><p><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to understand. People are more likely to sign your petition if they understand why you are making the request.<br></em><br>
+</fieldset>
+<div class="form-group" >
+ <input type="file" class="form-control" name="doc_type" />
+ 
+ </div>
+ <!--<button type="button" id="prev2" style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Prev</button>
+<button type="button" id="next3" style="background-color:#9e7c0c;color:#ffffff" class="nexttab btn btn-default">Next</button>-->
+
+</div>
+{% else %}
+
+<fieldset><span class="formField-description">
+  <h5 class="formFieldTitle">Petition details</h5>
+  <div class="row" id="step1" >
+  
+ 
+  <div class="form-group" >
+      
+    <label class="formField"><span class="formField-text">Petition Title <span class="mandatory">*</span></span>
+  <span class="formField-validation"></span>
+  <input class="form-control" aria-label="Petition title" id="title" type="text" name="title" required></label>
+
+
+  </div>
+  <p><strong><em>Tip:</em></strong>&nbsp;&nbsp;<em>The petition title is a summary of your petition request and the first part of the petition that people will see. Keep it short and to the point.</em><br><br>
+  <div class="form-group"><label class="formField"><span class="formField-text">Intended recipient of the petition <span class="mandatory">*</span></span><span class="formField-validation"></span>
+  <input class="form-control" id="intended_to" aria-label="intended_to" type="text" name="intended_to"></label><p>Words directed to where the petition is going to.</p></div></fieldset>
+  
+ 
+  <button type="button"  id="next1" style="background-color:#9e7c0c;color:#ffffff" class=" btn btn-default">Next</button>
+  </div>
+  
+  <br>
+  <div class="row" id ="step2"  >
+     <h3>Terms of your petition </h3>
+  
+    <fieldset><h5 class="formFieldTitle">Petition terms</h5><span class="formField-validation"></span><p><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to understand. People are more likely to sign your petition if they understand why you are making the request.<br></em><br>
+  </fieldset>
+  
+  <div class="form-group" >
+      <label for="textAreaField" style="color:black;" class="text-info">Description <span class="mandatory">*</span</label><br> 
+      <p>The reason explains what the problem is and why you are asking for change.&nbsp;</p>
+       <textarea name="description" class="form-control" id="description" rows="4"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition" required></textarea> 
+     
+    </div>
+      <button type="button" id="prev2" style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Prev</button>
+  <button type="button"id="next2" style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Next</button>
+  </div>
+  
+  
+  <div class="row" id="step3"  >
+  <h3>Attachment of your petition </h3>
+   <fieldset><h5 class="formFieldTitle">Petition Attachment</h5><span class="formField-validation"></span><p><strong><em>Tip:</em></strong><em>&nbsp;Make sure your reason is clear and easy to understand. People are more likely to sign your petition if they understand why you are making the request.<br></em><br>
+  </fieldset>
+  <div class="form-group" >
+   <input type="file" class="form-control" name="doc_type" />
+   
+   </div>
+   <button type="button" id="prev2" style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Prev</button>
+  <button type="button" id="next3" style="background-color:#9e7c0c;color:#ffffff" class="nexttab btn btn-default">Next</button>
+  
+  </div>
+ 
+
+<div class="row" id="step4" >
+<h3 class="petitionSecondaryTitle">Please fill in your details – you are the Principal Petitioner</h3>
+
+
+
+
+
+<div class="form-group" >
+  <label for="registerName">Full Name</label>
+  <input name="name" type="text" class="form-control" id="name" placeholder="Enter your full name" required />
+
+</div>
+
+
+<div class="form-group">
+<div id="error"></div>
+    <label for="registerID">ID Number</label>
+    <input name="id_number" type="tel" class="form-control" id="registerID" placeholder="Enter ID Number" id="id_number" maxlength="13" onkeypress="return IsNumeric(event);" required/>
+    <div class='validation error-display_2' id="error_id_number"></div>
+</div>
+
+
+
+
+<div class="form-group">
+    <label for="registerPhoneNumber">Phone Number</label>
+    <input name="phone_number" type="tel" class="form-control" id="phone_number" maxlength="11"
+        placeholder="Enter Phone Number"  required/>
+       
+</div>
+
+
+
+
+
+<div class="form-group">
+    <label for="registerProvince">Province</label><br>
+    <select id="select-field1" onchange="updateSelectField()" id="province" name="province" class="form-control">
+        <option value="">Select...</option>
+        <option value="0">Eastern Cape</option>
+        <option value="1">Free State</option>
+        <option value="Gauteng">Gauteng</option>
+        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+        <option value="Limpopo">Limpopo</option>
+        <option value="Mpumalanga">Mpumalanga</option>
+        <option value="Northern Cape">Northern Cape</option>
+        <option value="North West">North West</option>
+        <option value="Western Cape">Western Cape</option>
+    </select>
+   
+</div>
+
+<div class="form-group">
+    <label for="registerMunicipality">Municipality</label>
+
+    <select id="select-field2" name="municipality" id="municipality" class="form-control">
+        <option value="City Of Cape Town">City Of Cape Town</option>
+    </select>
+
+  
+</div>
+
+
+
+<div class="form-group">
+   
+    <label for="registerEmail">Email</label>
+    <input name="email" type="email" class="form-control" id="email" placeholder="Enter your email"  required/>
+    
+</div>
+</div>
+{% endif %}
+<button type="button" id="prev3"  style="background-color:#9e7c0c;color:#ffffff" class="btn btn-default">Prev</button>
+<button type="submit"   style="background-color:#9e7c0c;color:#ffffff" class="nexttab btn btn-default">Create</button>
+<div id="result"> </div>
+<br>
+<br>
+
+
+
+
+
+</form>
+
+
+
+
+
+
+
+
+
+<br>
+</body>
+</html>
+
+
+
+

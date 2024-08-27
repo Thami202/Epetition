@@ -1,0 +1,151 @@
+title = "chatbot"
+url = "/chatbot"
+layout = "default"
+is_hidden = 0
+==
+<?php
+function onStart() 
+{
+   
+    $this->addJs('assets/javascript/webchat.js');
+    
+}
+?>
+==
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<title>Contoso Sample Web Chat</title>--> 
+    <!-- This styling is for the Web Chat demonstration purposes. It is recommended that style is moved to separate file for organization in larger projects -->
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 16px;
+            font-family: Segoe UI;
+            line-height: 20px;
+            color: whitesmoke;
+            display: table-cell;
+            padding: 13px 0px 0px 20px;
+        }
+
+        #heading {
+            background-color: #275937;
+            height: 50px;
+            width: 838px;
+        }
+
+        .main {
+            margin: 18px;
+            border-radius: 4px;
+        }
+
+        div[role="form"]{
+            background-color: none;
+        }
+
+        #webchat {
+            position: absolute;
+            height: calc(100% - 350px);
+            width: 50%;
+            top: 290px;
+            overflow: hidden;
+            backgroundColor: lightgray;
+
+        }
+
+    </style>
+    
+
+</head>
+<body>
+    <div>
+        <div id="heading">
+            <!-- Change the h1 text to change the bot name -->   
+            
+            <h1>Petition</h1>
+        </div>
+      
+        
+        <h4><div id="webchat" style="margin-top:150px; width:66%;"  role="main"></div></h4>
+        <br>
+        
+    </div>    
+
+ <!-- <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>-->
+
+ 
+  <script>
+        const styleOptions = {
+
+         
+           // Add styleOptions to customize Web Chat canvas
+           hideUploadButton: true
+           //userAvatarImage: 'https://avatars.githubusercontent.com/u/661465'
+           
+           
+           
+        };
+
+        //var theURL = "https://default25d23701b4e544c3b18414a9caa63b.79.environment.api.powerplatform.com/powervirtualagents/bots/039bc046-1127-4041-abb2-e536075a4e33/directline/token?api-version=2022-03-01-preview";
+        var theURL = "https://default25d23701b4e544c3b18414a9caa63b.79.environment.api.powerplatform.com/powervirtualagents/bots/039bc046-1127-4041-abb2-e536075a4e33/directline/token?api-version=2022-03-01-preview";
+
+        var environmentEndPoint = theURL.slice(0,theURL.indexOf('/powervirtualagents'));
+        var apiVersion = theURL.slice(theURL.indexOf('api-version')).split('=')[1];
+        var regionalChannelSettingsURL = `${environmentEndPoint}/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`; 
+
+        var directline;
+            fetch(regionalChannelSettingsURL)
+                .then((response) => {
+                    return response.json();
+                    })
+                .then((data) => {
+                    directline = data.channelUrlsById.directline;
+                    })
+                .catch(err => console.error("An error occurred: " + err));
+
+      fetch(theURL)
+            .then(response => response.json())
+            .then(conversationInfo => {
+                window.WebChat.renderWebChat(
+                    {
+                        directLine: window.WebChat.createDirectLine({
+                            domain: `${directline}v3/directline`,
+                            token: conversationInfo.token,
+                        }),
+                        styleOptions
+                    },
+                    document.getElementById('webchat')
+                );
+            })
+            .catch(err => console.error("An error occurred: " + err));
+
+    </script>
+  </body>
+</html>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<a href="http://localhost:8081/epetitionoctober/"><button type="button"  id="next" style="background-color:#9e7c0c;color:#ffffff" class=" btn btn-default">Exit</button></a>
+<br>
+<br>

@@ -1,0 +1,48 @@
+plugin:
+    name: 'ahmadfatoni.apigenerator::lang.plugin.name'
+    description: 'ahmadfatoni.apigenerator::lang.plugin.description'
+    author: '`Shibambu Rodwell'
+    icon: oc-icon-send-o
+    homepage: ''
+permissions:
+    Manage_Petition:
+        tab: 'ahmadfatoni.apigenerator::lang.plugin.name'
+        label: 'ahmadfatoni.apigenerator::lang.plugin.permitions.manage_petition'
+    Manage_Status:
+        tab: 'ahmadfatoni.apigenerator::lang.plugin.name'
+        label: 'ahmadfatoni.apigenerator::lang.plugin.permissions.manage_status'
+    Manage_Conversations:
+        tab: 'ahmadfatoni.apigenerator::lang.plugin.name'
+        label: 'ahmadfatoni.apigenerator::lang.plugin.permissions.manage_conversations'
+    Manage_profile:
+        tab: 'ahmadfatoni.apigenerator::lang.plugin.name'
+        label: 'ahmadfatoni.apigenerator::lang.plugin.permissions.manage_profile'
+    Manage_Signature:
+        tab: 'ahmadfatoni.apigenerator::lang.plugin.name'
+        label: 'ahmadfatoni.apigenerator::lang.plugin.permissions.manage_signature'
+navigation:
+    main-menu-item:
+        label: 'ahmadfatoni.apigenerator::lang.plugin.name'
+        url: ahmadfatoni/apigenerator/apigeneratorcontroller
+        icon: icon-life-ring
+        sideMenu:
+            side-menu-petitions:
+                label: 'ahmadfatoni.apigenerator::lang.plugin.permissions.petitions'
+                url: ahmadfatoni/apigenerator/apigeneratorcontroller
+                icon: icon-sitemap
+            side-menu-status:
+                label: Status
+                url: ahmadfatoni/apigenerator/status
+                icon: icon-cog
+                permissions:
+                    - Manage_Status
+            side-menu-conversation:
+                label: 'ahmadfatoni.apigenerator::lang.plugin.backend.forms.converations'
+                url: ahmadfatoni/apigenerator/conversations
+                icon: icon-wechat
+                permissions:
+                    - Manage_Conversations
+            side-menu-item:
+                label: Signature
+                url: ahmadfatoni/apigenerator/signaturecontroller
+                icon: icon-sitemap

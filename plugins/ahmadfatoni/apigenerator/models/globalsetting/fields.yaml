@@ -1,0 +1,14 @@
+tabs:
+  fields:
+    metaConfig:
+      label: Meta API URL
+      type: text
+      required: true
+      span: auto
+      tab: Meta
+    metaAccessToken:
+      label: Access Token
+      type: textarea
+      span: auto
+      size: small
+      tab: Meta

@@ -1,0 +1,10 @@
+name: Status
+form: $/ahmadfatoni/apigenerator/models/status/fields.yaml
+modelClass: ahmadfatoni\apigenerator\Models\Status
+defaultRedirect: ahmadfatoni/apigenerator/status
+create:
+    redirect: 'ahmadfatoni/apigenerator/status/update/:id'
+    redirectClose: ahmadfatoni/apigenerator/status
+update:
+    redirect: ahmadfatoni/apigenerator/status
+    redirectClose: ahmadfatoni/apigenerator/status

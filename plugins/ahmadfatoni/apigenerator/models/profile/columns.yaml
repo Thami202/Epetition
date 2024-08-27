@@ -1,0 +1,24 @@
+columns:
+    id:
+        label: id
+        type: number
+    id_number:
+        label: id_number
+        type: text
+    phone_number:
+        label: phone_number
+        type: text
+    user_id:
+        label: User
+        type: text
+        relation: user
+        valueFrom: name
+    province:
+        label: province
+        type: text
+    municipality:
+        label: municipality
+        type: text
+    created_at:
+        label: created_at
+        type: datetime

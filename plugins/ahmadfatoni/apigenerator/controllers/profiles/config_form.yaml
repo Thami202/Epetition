@@ -1,0 +1,11 @@
+name: Profiles
+modelClass: AhmadFatoni\ApiGenerator\Models\Profile
+form: $/ahmadfatoni/apigenerator/models/profile/fields.yaml
+defaultRedirect: ahmadfatoni/apigenerator/profiles
+create:
+    redirect: 'ahmadfatoni/apigenerator/profiles/update/:id'
+    redirectClose: ahmadfatoni/apigenerator/profiles
+update:
+    redirect: ahmadfatoni/apigenerator/profiles
+    redirectClose: ahmadfatoni/apigenerator/profiles
+preview: {  }

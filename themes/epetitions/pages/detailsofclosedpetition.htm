@@ -1,0 +1,119 @@
+title = "Closed Petitions"
+url = "/detailpetition/:id/"
+layout = "default"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+function onStart() {
+    try {
+        // Retrieve the petition with the specified ID
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$this->param('id'));
+        $petition = json_decode($response);
+
+        // Retrieve the signature count for the selected petition
+        if (!empty($petition->id)) {
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/signature-count');
+        $signature_count = json_decode($response)->count;
+
+        // Add the signature count to the petition
+        $petition->signature_count = $signature_count;
+        }
+        $this['petition'] = $petition;
+        $this['signatures'] = [];
+    } catch (ApplicationException $e) {
+        $this['petition'] = null;
+        $this['signatures'] = [];
+    }
+}
+?>
+==
+<h3>
+
+    <span class="heading-secondary">{{petition.title}}</span>
+
+    </h3>
+
+   
+
+ <details>
+      <summary><span class="summary">More details</span></summary>
+      <div><p>{{petition.description}}</p></div>
+    </details>
+
+<p class="flash-notice">
+      This petition is closed
+      <br>
+      <span>All petitions run for 6 months</span>
+    </p>
+
+  <div class="signature-count">
+    <p class="signature-count-number">
+      <span class="count" data-count="699598">{{ petition.signature_count }}</span> <span class="text">signatures</span>
+    </p>
+    <div class="signature-count-graph" aria-hidden="true">
+      <span class="signature-count-current" style="width: 32.09%"></span>
+    </div>
+  </div>
+  <h1 id="debate-threshold-heading">Parliament decided to  debate this petition</h1>
+  <p>The issue of pitbull being a danger to the community was one that the goverment could not turn a blind eye on , so many factors were being discussed to try to find some of the solution of these petition such as , any breed of dog has the potential to cause harm or death if it is not properly trained or socialized, or if it is trained to be aggressive. Factors such as lack of proper training, socialization, and abuse or neglect can contribute to aggressive behavior in any breed of dog,responsible ownership and enforcing existing animal control laws.</p>
+<h1 id="response-threshold-heading">Government responded</h1>
+<p class="secondary">This response was given on 20 January 2023</p>
+<p>South Africa plan to  implemented breed-specific legislation (BSL) that targets pit bulls and other "dangerous" breeds. This legislation often includes measures such as mandatory sterilization, muzzling in public, and even euthanasia of pit bulls , The government plan to take the pitbull away from the owners not by force but only if the owners want to give them up<p>
+<h2><p> Date Closed <p></h2>
+<h4><p> 15 December 2022 <p></h4>
+ 
+  <!--<ul class="petition-meta">
+    <li class="meta-created-by">
+      <span class="label">Created by</span> Wayne baker
+    </li>
+    <li class="meta-deadline">
+        <span class="label">Deadline</span> 21 January 2023
+        <span class="note">All petitions run for 6 months</span>
+    </li>
+    <li class="meta-json">
+      <span class="note"><a href="/petitions/618680.json">Get petition data (json format)</a></span>
+      <details role="group">
+  <summary role="button" aria-controls="about-json-content" aria-expanded="true">
+    <span class="summary">About petition data</span>
+  </summary>-->
+
+ <style>
+ 
+ .summary {
+  color:  #275937;
+}
+      
+    .flash-notice {
+  color: #fff;
+  background: #275937;
+  margin: 15px 0;
+  text-align: center;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+  text-transform: none;
+  padding: 0.8333333333em 1.6666666667em;
+}
+.signature-count .signature-count-number {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 48px;
+  line-height: 1.0416666667;
+  font-weight: 700;
+  text-transform: none;
+  font-weight: 700;
+  margin-top: 0.4166666667em;
+  margin-bottom: 0.2777777778em;
+}
+
+details summary {
+  color: #2b8cc4;
+}
+
+    </style>

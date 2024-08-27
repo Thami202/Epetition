@@ -1,0 +1,406 @@
+description = "Home page"
+==
+<?php
+use Illuminate\Support\Facades\Auth;
+use RainLab\User\Components\Session;
+
+
+
+function onStart()
+{
+    $pageJs = 'themes/epetitions/assets/javascript/' . $this->page->baseFileName . '.js';
+    if(file_exists($pageJs)) {
+        $this->addJs('assets/javascript/' . $this->page->baseFileName . '.js');
+    }
+    
+    
+}
+?>
+==
+<!doctype html>
+<!DOCTYPE html>
+<html>
+    <head>
+    
+    
+        <meta charset="utf-8">
+        <title>Epetition - {{ this.page.title }}</title>
+        <meta name="description" content="{{ this.page.meta_description }}">
+        <meta name="title" content="{{ this.page.meta_title }}">
+        <meta name="author" content="October CMS">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="{{ 'assets/images/parliament.png'|theme }}">
+        
+        {% styles %}
+        <link href="{{ [
+            'assets/less/theme.less'
+        ]|theme }}" rel="stylesheet">
+        <style>
+/*a:hover {
+  background-color: #275937;
+}
+*/
+h2, .h2 {
+    font-size: 1.75rem;
+    line-height: 1.4;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    text-transform: uppercase;
+}
+h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #fefefe;
+    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+    font-weight: normal;
+    line-height: 1.5;
+    color: #8F8579;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#main-horiz-menu > li > a {
+    font-family: ff-dax-pro, sans-serif;
+    font-weight: 600;
+    color: #fefefe;
+    padding: 1.25rem 1rem;
+    text-transform: uppercase;
+    height: 64px;
+    text-align: center;
+
+}
+
+ p {
+    margin-bottom: 1rem;
+    font-size: 16px;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+ 
+    }
+
+
+.navbar-nav > li > a:hover {
+  background-color: #275937 !important;
+}
+
+.dropdown-content >a:hover {
+    background-color: #275937 !important;
+    
+}
+
+.navbar-nav> li {
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
+.navbar {
+  border-bottom: 4px solid #ecba48;
+}
+
+ul.navbar-nav > li:last-child {
+  border-bottom: none;
+}
+
+
+.jumbotron {
+  
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  height: 48vh;
+    padding: 100px 20px 20px 20px;
+    padding: 100px 20px 20px 20px; /* adjust the top padding value */
+  margin-top: 50px; 
+
+}
+
+
+
+.carousel-indicators {
+   position: absolute;
+    top: 270px;
+    left: 50%;
+    z-index: 15;
+    width: 60%;
+    margin-left: -30%;
+    padding-left: 0;
+    list-style: none;
+    text-align: center;
+    
+}
+.carousel-control.right
+{
+left: auto;
+    right: 0;
+    background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);
+    background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);
+   
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);
+}
+
+<!--sub-menu-->
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-family: ff-dax-pro, sans-serif;
+    font-weight: 600;
+    color: #fefefe;
+    padding: 1.25rem 1rem;
+    text-transform: uppercase;
+    height: 64px;
+    text-align: center;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+</style>
+    </head>
+    <body>
+ 
+
+    
+    <div class="container" >
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid" style="background:#9e7c0c;">
+            <div class="navbar-header">
+            
+            
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example">
+                    <span class="sr-only">:</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                
+                
+                <a class="navbar-brand" style="color: #9e7c0c;" href="http://localhost/epetition/">epetition request</a>
+                <img src="{{ 'assets/images/october.png'|theme }}" style="padding-right:500px; position:absolute;height:80%;">
+            </div>
+           <div class="collapse navbar-collapse" id="bs-example">
+    <ul class="nav navbar-nav">
+        {% if user %}
+        <li class="{% if this.page.id == 'account' %}active{% endif %}">
+            <a style="color:white;background-color:#9e7c0c; padding-top:25px;" href="{{ 'request-petition'|page }}">Petitions</a>
+        </li>
+        {% endif %}
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+        {% if user %}
+        <li>
+            <a style="color:white;background-color:#9e7c0c; padding-top:25px;" href="javascript:;" data-request="onLogout" data-request-data="redirect: '/signin'">Logout</a>
+        </li>
+        {% else %}
+        <li class="{% if this.page.id == 'account' %}active{% endif %}">
+            <a style="color:white;background-color:#9e7c0c; padding-top:25px;" href="{{ 'request-petition'|page }}">Home</a>
+        </li>
+        <li class="{% if this.page.id == 'account' %}active{% endif %}">
+            <a style="color:white;background-color:#9e7c0c; padding-top:25px;" href="petitions">Sign In</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+           
+
+    
+
+        <!-- Header -->
+        <header id="myCarousel" class="carousel slide">
+            
+
+            <!-- Nav 
+            <nav id="layout-nav" class="navbar navbar-default navbar-fixed-middle" role="navigation"  style="background-color:#efeade">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        
+                 
+                    </div>
+                   <div class="collapse navbar-collapse navbar-main-collapse">
+                        <ul class="nav navbar-nav">
+                           <li class="{% if this.page.id == 'account' %}active{% endif %}"><a href="{{ 'account'|page }}">Get Started</a></li>
+                            <!--<li class="{% if this.page.id == 'blog' %}active{% endif %}"><a href="{{ 'blog'|page }}">Blog</a></li>
+                            <li class="{% if this.page.id == 'forum' %}active{% endif %}"><a href="{{ 'forum'|page }}">Petitions</a></li>
+                             <li class="{% if this.page.id == 'forum' %}active{% endif %}"><a href="{{ 'home'|page }}">Epetition Request</a></li>-->
+                        </ul>
+                        <!--<ul class="nav navbar-nav navbar-right">
+                            
+                        </ul>-->
+                    </div>
+                </div>
+            </nav>
+       
+         
+ 
+
+       
+            <div class="carousel-inner"   data-ride="carousel">
+                
+                <div class="item active">
+                    <!-- Add your second slide content here -->
+                  
+                    <div class="jumbotron" style="background-image:url({{ ('assets/images/textures/submissions.jpg')|theme }})">
+                        <div class="container">
+                            <h1><a style="color:transparent;"> Home</a></h1>
+                            <p><a style="color:transparent;">{{ this.page.description }}</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <!-- Add your third slide content here -->
+                    
+                    
+                    <div class="jumbotron" style="background-image:url({{ ('assets/images/textures/petition.jpg')|theme }})">
+                        <div class="container">
+                            <h1><a style="color:transparent;"> Home</a></h1>
+                            <p><a style="color:transparent;">{{ this.page.description }}</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <!-- Add your fourth slide content here -->
+                     <!-- Add your third slide content here -->
+                     
+                    
+                     <div class="jumbotron" style="background-image:url({{ ('assets/images/textures/report.jpg')|theme }})">
+                         <div class="container">
+                             <h1><a style="color:transparent;"> Home</a></h1>
+                             <p><a style="color:transparent;">{{ this.page.description }}</a></p>
+                         </div>
+                     </div>
+                </div>
+                <div class="item">
+                    <!-- Add your fifth slide content here -->
+                     <!-- Add your third slide content here -->
+
+                    
+                     <div class="jumbotron" style="background-image:url({{ ('assets/images/textures/house.jpg')|theme }})">
+                         <div class="container">
+                             <h1><a style="color:transparent;"> Home</a></h1>
+                             <p><a style="color:transparent;">{{ this.page.description }}</a></p>
+                         </div>
+                     </div>
+                </div>
+                             <!-- Controls -->
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+
+            <span class="icon-prev"></span>
+
+
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+            </div>
+           
+        
+            </div>
+         
+             </header>
+            <div class="container">
+                {% page %}
+            </div>
+         
+            </div>
+        
+      
+      
+
+        <!--test-->
+
+
+
+        <!-- Footer -->
+        <footer  id="layout-footer" style=" 
+    height: 50px;
+    background-color: #275937;
+    bottom: 0px;
+    left: 0px;
+    right: 50px;
+    margin-bottom: 0px;
+     padding: 60px">
+
+     {% partial "footer" %}
+  
+</footer>
+       <!-- <footer id="layout-footer"  style="background-color:#275937">
+            {% partial "footer" %}
+        </footer>-->
+
+        <!-- Scripts -->
+        <script src="{{ [
+            'assets/javascript/jquery.js',
+            'assets/vendor/bootstrap/js/transition.js',
+            'assets/vendor/bootstrap/js/alert.js',
+            'assets/vendor/bootstrap/js/button.js',
+            'assets/vendor/bootstrap/js/carousel.js',
+            'assets/vendor/bootstrap/js/collapse.js',
+            'assets/vendor/bootstrap/js/dropdown.js',
+            'assets/vendor/bootstrap/js/modal.js',
+            'assets/vendor/bootstrap/js/tooltip.js',
+            'assets/vendor/bootstrap/js/popover.js',
+            'assets/vendor/bootstrap/js/scrollspy.js',
+            'assets/vendor/bootstrap/js/tab.js',
+            'assets/vendor/bootstrap/js/affix.js',
+            'assets/javascript/app.js'
+        ]|theme }}">
+        
+</script>
+        {% framework extras %}
+        {% scripts %}
+        <script>
+       $('.carousel').carousel({
+        interval: 2000 
+    })   
+    </script>
+
+<script>
+    function logout() {
+        // Perform logout logic here, e.g. make an AJAX request to log out the user
+        
+        // Redirect to the desired page after successful logout
+        window.location.href = "{{ 'signin'|page }}"; // Replace with the URL of the desired page
+    }
+    </script>
+    
+    
+    </body>
+</html>

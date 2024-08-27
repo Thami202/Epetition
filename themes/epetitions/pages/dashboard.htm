@@ -1,0 +1,131 @@
+title = "Dashboard"
+url = "/dashboard"
+layout = "default"
+is_hidden = 0
+==
+<br>
+        <h1 class="page-header">My Dashboard</h1>
+       
+<div class="dashboard">
+ <div class="card">
+    <h2><a href="usermanagement">Users Management</h2></a>
+    <p>User can update,view and remove.</p>
+  </div>
+
+
+  <div class="card">
+    <h2><a href="my-petitions">My Petitions</h2></a>
+    <p> User can track,create,sign and view Rules of petition.</p>
+  </div>
+ <!-- <div class="card">
+    <h2><a href="#">View Petition</h2></a>
+    <p>Users to view a list of petitions that have been created.</p>
+  </div>--->
+  <!--<div class="card">
+    <h2><a href="#">Track petition</h2></a>
+    <p>Users to track the progress of a specific petition.</p>
+  </div>-->
+</div>
+<br>
+<br>
+
+<!--<div class="col-sm-9">
+      <div class="well">
+        <h4>My Dashboard</h4>
+       
+      </div>
+<div id="options-row">
+  <div class="option-block">
+    <a href="#">CreatePetition</a>
+  </div>
+  <br>
+  <div class="option-block">
+    <a href="#">ViewPetition</a>
+  </div>
+  <div class="option-block">
+    <a href="#">Trackpetition</a>
+  </div>
+</div>-->
+
+<style>
+#sidebar {
+  width: 240px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #9E7C0C;
+  padding: 34px;
+}
+
+#sidebar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar li {
+  margin: 10px 0;
+}
+
+#sidebar a {
+  color: #fff;
+  text-decoration: none;
+}
+#sidebar-nav ul li.active a {
+  background: #fff;
+}
+#options-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.option-block {
+  width: 30%;
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(179, 153, 93, 0.2);
+  border-radius: 5px;
+}
+
+.option-block a {
+  color: #000;
+  text-decoration: none;
+  display: block;
+}
+#sidebar a {
+  color: #fff;
+  text-decoration: none;
+}
+
+#sidebar a.active {
+  color: #fff;
+  background-color: #275937;
+}
+#sidebar ul li.active a {
+  background: #275937;
+  color: #333;
+}
+#sidebar ul li:hover a {
+  background: #275937;
+  color: #333;
+}
+/*.well{
+    background-color:rgba(179, 153, 93, 0.2);
+}*/
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    color:#6C4D23;
+  }
+  .card {
+    background-color:rgba(179, 153, 93, 0.2);
+    padding: 20px;
+    text-align: center;
+  }
+  .page-header{
+  color:#6C4D23;
+  }
+</style>

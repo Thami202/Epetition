@@ -1,0 +1,21 @@
+fields:
+    user:
+        label: User
+        span: auto
+        type: dropdown
+    id_number:
+        label: 'Id number'
+        span: auto
+        type: text
+    phone_number:
+        label: 'Phone number'
+        span: auto
+        type: text
+    province:
+        label: Province
+        span: auto
+        type: dropdown
+    municipality:
+        label: Municipality
+        span: auto
+        type: dropdown

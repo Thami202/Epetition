@@ -1,0 +1,27 @@
+columns:
+    id:
+        label: id
+        type: number
+    phone_number:
+        label: phone_number
+        type: text
+    name:
+        label: name
+        type: text
+    status:
+        label: status
+        type: text
+        select: name
+        relation: status
+    started_at:
+        label: started_at
+        type: text
+    ended_at:
+        label: ended_at
+        type: text
+    user_id:
+        label: user_id
+        type: number
+    created_at:
+        label: created_at
+        type: datetime

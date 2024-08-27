@@ -1,0 +1,328 @@
+description = "Everything else"
+
+[breadcrumbs]
+main-ol-class = "breadcrumb"
+active-class = "active"
+disabled-class = "disabled"
+==
+<?php
+use System\Classes\CombineAssets;
+use RoscoeCairney\Parliament\Models\ParliamentSetting;
+
+function onStart() {
+
+  // Load menu array
+  require_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/roscoecairney/ParlyMenu/ParlyMenu.php');
+  $parly_menu = new ParlyMenu;
+  $this['menuStructure'] = $parly_menu->getMenu();
+
+  // Build arrays of CSS and Javascript to inject
+  $cssAssets = [
+    'assets/css/slick.css',
+    'assets/foundation-sites/dist/assets/css/app.css',
+    'assets/css/foundation-icons.css',
+    'assets/css/mine.css',
+    'assets/css/flickity.css',
+    'assets/css/filetree.css'
+  ];
+
+  $jsAssets = [
+  'assets/js/vendor/jquery-3.4.1.min.js',
+  'assets/js/vendor/slick.min.js',
+  'assets/js/vendor/trumbowyg/dist/trumbowyg.min.js',
+  'assets/foundation-sites/dist/assets/js/app.js',
+  'assets/js/vendor/what-input.min.js',
+  'assets/js/vendor/flickity.pkgd.min.js',
+  'assets/js/vendor/filetree.js',
+  'assets/js/angular/searchApp.js',
+  'assets/js/angular/searchFactory.js'
+  ];
+
+  switch ($this->page->baseFileName) {
+    case 'home':
+      array_push($cssAssets,
+        'assets/css/flickity.css',
+        'assets/css/fullcalendar.min.css',
+        'assets/css/jquery.dynatable.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/flickity.pkgd.min.js',
+        'assets/js/vendor/moment.min.js',
+        'assets/js/vendor/fullcalendar.min.js',
+        'assets/js/vendor/jquery.dynatable.min.js'
+      );
+      break;
+    case 'publication-details':
+      array_push($jsAssets,
+        'assets/js/vendor/turn.min.js',
+        'assets/js/vendor/zoom.min.js'
+      );
+      break;
+    case 'member-details':
+      array_push($jsAssets,
+      //  'assets/js/vendor/trumbowyg/dist/trumbowyg.min.js',
+        'assets/js/vendor/htmlpurifier-4.10.0/library/HTMLPurifier.auto.php'
+      );
+      array_push($cssAssets,
+      'assets/js/vendor/trumbowyg/dist/ui/trumbowyg.min.css'
+      );
+      break;
+    case 'bill-submission':
+      array_push($jsAssets,
+        'assets/js/vendor/trumbowyg/dist/trumbowyg.min.js',
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      array_push($cssAssets,
+      'assets/js/vendor/trumbowyg/dist/ui/trumbowyg.min.css'
+      );
+      break;
+    case 'how-to-petition-parliament':
+      array_push($jsAssets,
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      break;
+    case 'visiting-parliament':
+      array_push($jsAssets,
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      break;
+    case 'bills':
+      array_push($jsAssets,
+        'assets/js/angular/billsApp.js',
+        'assets/js/angular/billsFactory.js'
+
+      );
+      break;
+    case 'bills-other':
+      array_push($jsAssets,
+        'assets/js/angular/billsApp.js',
+        'assets/js/angular/billsFactory.js'
+
+      );
+      break;
+    case 'bills-passed':
+      array_push($jsAssets,
+        'assets/js/angular/billsApp.js',
+        'assets/js/angular/billsFactory.js'
+
+      );
+      break;
+    case 'have-your-say':
+      array_push($jsAssets,
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      break;
+    case 'group-details':
+      array_push($jsAssets,
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/vendor/lodash.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      break;
+    case 'person-details':
+      array_push($jsAssets,
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/lodash.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      break;
+    case 'committees':
+      array_push($cssAssets,
+        'assets/css/jquery.dynatable.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/jquery.dynatable.min.js'
+      );
+      break;
+    case 'committee-meetings':
+      array_push($jsAssets,
+        'assets/js/vendor/angular-messages.min.js',
+        'assets/js/vendor/angular-sanitize.min.js',
+        'assets/js/angular/app.js',
+        'assets/js/angular/factory.js'
+      );
+      break;
+    case 'parliamentary-papers':
+      array_push($cssAssets,
+        'assets/css/jquery.dynatable.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/jquery.dynatable.min.js'
+      );
+      break;
+    case 'legislation':
+    case 'hansard':
+    case 'hansard-replies':
+      array_push($cssAssets,
+        'assets/css/jquery.dynatable.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/jquery.dynatable.min.js'
+      );
+      break;
+    case 'mandates':
+      array_push($cssAssets,
+        'assets/css/jquery.dynatable.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/jquery.dynatable.min.js'
+      );
+      break;
+    case 'acts-of-parliament':
+      array_push($cssAssets,
+        'assets/css/jquery.dynatable.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/jquery.dynatable.min.js'
+      );
+      break;
+    case 'insession':
+    case 'oversight-forum':
+    case 'parliamentary-budget-office':
+    case 'office-inst-support-democracy':
+      array_push($cssAssets,
+        'assets/css/flickity.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/flickity.pkgd.min.js'
+      );
+      break;
+    case 'press-release':
+    case 'news-all':
+      array_push($cssAssets,
+        'assets/css/foundation-datepicker.min.css'
+      );
+      array_push($jsAssets,
+        'assets/js/vendor/foundation-datepicker.min.js'
+      );
+      break;
+    case 'media-accreditation':
+      array_push($jsAssets,
+        'assets/js/vendor/moment.min.js',
+        'assets/js/vendor/validate.min.js',
+        'assets/js/vendor/jquery-throttle.min.js'
+      );
+      break;
+  }
+
+  $theme_path = $_SERVER["DOCUMENT_ROOT"] . '/themes/' . Config::get("cms.activeTheme",'');
+  array_push($jsAssets,
+    'assets/js/all.js',
+    'assets/js/vendor/google-analytics.js'
+  );
+  $thisPageJs = $theme_path . '/assets/js/' . $this->page->baseFileName . '.js';
+  if (file_exists($thisPageJs)) {
+    array_push($jsAssets,
+      'assets/js/' . $this->page->baseFileName . '.js'
+    );
+  }
+
+  $jsAssets = array_map(function ($asset) use ($theme_path) { return substr($theme_path . '/' . $asset, 1); }, $jsAssets);
+  $cssAssets = array_map(function ($asset) use ($theme_path) { return substr($theme_path . '/' . $asset, 1); }, $cssAssets);
+
+  $this->addJs('assets/js/vendor/angular.min.js');
+  
+    foreach ($jsAssets as $jsAsset) {
+        $this->addJs(str_replace('mnt/web/html/themes/parliament/', '', $jsAsset));
+    }
+    foreach ($cssAssets as $cssAsset) {
+        $this->addCss(str_replace('mnt/web/html/themes/parliament/', '', $cssAsset));
+    } 
+  
+  $this->addJs(CombineAssets::combine($jsAssets, $this->assetPath));
+  $this->addCss(CombineAssets::combine($cssAssets, $this->assetPath));
+
+  $this['randomBanner'] = 'Small_Banner' . rand(1,7) . '.jpg';
+  $this['parliament_sitting'] = ParliamentSetting::get('parliament_sitting');
+
+}
+?>
+==
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        {% partial "ga_tracking" %}
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ this.page.title }} - Parliament of South Africa</title>
+<!-- Hotjar Tracking Code for https://www.parliament.gov.za/ -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1227088,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NQKPXSG');</script>
+<!-- End Google Tag Manager -->
+
+        {% styles %}
+        <script type="text/javascript" src="/themes/parliament/assets/js/vendor/pace.js"></script>
+        <!--script type="text/javascript" src="//platform-api.sharethis.com/js/sharethis.js#property=58b59b14949fce00118ce701&product=inline-share-buttons"></script-->
+    </head>
+    <body class="page-{{ this.page.id }}">
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NQKPXSG"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+      <div class="off-canvas-wrapper">
+        <div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+
+          <!-- This contains the off canvas left hand side navigation -->
+          <div class="off-canvas position-left" id="offCanvas" data-off-canvas>
+            {% partial "main-menu" menuType='vertical' %}
+          </div>
+
+          <!-- All on canvas content goes here -->
+          <div class="off-canvas-content" data-off-canvas-content>
+
+            <!-- desktop-nav -->
+            {% partial "desktop-nav" %}
+
+            <!-- Use either the projects/events partial or the default partial to render page content -->
+
+            <div  id="pageContent">
+              {% partial "page-content-full-width" %}
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    {% scripts %}
+    {% partial "dev-assets" %}
+    {% framework %}
+
+    {% partial "dcmi" %}
+    </body>
+</html>

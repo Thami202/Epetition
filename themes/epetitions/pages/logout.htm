@@ -1,0 +1,14 @@
+title = "logout"
+layout = "default"
+url = "/logout"
+==
+<?php
+use Illuminate\Support\Facades\Auth;
+
+public function logout()
+{
+    Auth::logout();
+    return redirect('/home');
+}
+?>
+==

@@ -1,0 +1,27 @@
+In October CMS, you can use the built-in function $this->signatureCount to count the number of signatures on a form or petition. You can call this function in your controller or component, and pass in the ID of the form or petition as an argument.
+
+For example, in a controller:
+
+
+
+public function onCountSignatures()
+{
+    $formId = post('formId');
+    $signatureCount = $this->signatureCount($formId);
+    return [
+        'signatureCount' => $signatureCount
+    ];
+}
+
+
+In a component, you can use this function in the php section:
+
+function onRender()
+{
+    $this->signatureCount = $this->signatureCount($formId);
+}
+
+And in the template you can use the variable :
+
+{{ signatureCount }}
+

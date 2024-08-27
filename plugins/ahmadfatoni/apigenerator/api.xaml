@@ -1,0 +1,6 @@
+apis:
+    -
+	  Default: Default
+	  plugin_code: ahmadfatoni.apigenerator
+	  permissions: null
+	  auth_required: 1

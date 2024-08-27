@@ -1,0 +1,194 @@
+title = "My Petitions"
+url = "/my-petitions"
+layout = "default"
+description = "My Petitions"
+meta_title = "My Petitions"
+meta_description = "My Petitions"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use Exception;
+use Http;
+
+
+function onStart() {
+  try {
+      $userId = Auth::getUser() ? Auth::getUser()->id : 0;
+      $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$userId.'/petitions-count');
+      $count = json_decode($response)->count;
+      $this['petitions_count'] = $count;
+  } catch(ApplicationException $e) {
+      $this['petitions_count'] = 0;
+  }
+}
+
+?>
+
+<br>
+        <h1 class="page-header">My Dashboard</h1>
+       
+<div class="dashboard">
+ <div class="card">
+    <h2><a href="petitions">Sign Petition</h2></a>
+    <p>User can sign a petition.</p>
+  </div>
+
+
+  <div class="card">
+    <h2><a href="request-petition">Request a new Petition</h2></a>
+    <p> User create a new petition.</p>
+  </div>
+ <!-- <div class="card">
+    <h2><a href="#">View Petition</h2></a>
+    <p>Users to view a list of petitions that have been created.</p>
+  </div>--->
+ <!-- <div class="card">
+    <h2><a href="petitionrequest">View Petition</h2></a>
+    <p>Users to track the progress of a specific petition.</p>
+  </div>-->
+  
+  <div class="card">
+    <h2><a href="my-petitiondetails">My Petitions</h2></a>
+    {% if petitions_count > 0 %}
+   <a href="my-petitiondetails"> <span class="badge badge-danger" style="background-color:#275937;"> {{petitions_count }}</span></a>
+   
+                         
+        {% else %}
+         <a href="my-petitiondetails"> <span class="badge badge-danger" style="background-color:#275937;">0</span></a>
+                          
+                        {% endif %}
+    <p>User to track the progress of a specific petition.</p>
+    
+    
+  </div>
+
+  <div class="card">
+    
+    <h2><a  href="{{'petition-info'|page}}">Petition Info</h2></a>
+    <p>User view info of petitions.</p>
+  </div>
+  
+   <div class="card">
+    <h2><a href="{{'stats'|page}}">Petition Stats</h2></a>
+    <p>petitions statistics.</p>
+  </div>
+
+
+</div>
+<br>
+<br>
+
+<!--<div class="col-sm-9">
+      <div class="well">
+        <h4>My Dashboard</h4>
+       
+      </div>
+<div id="options-row">
+  <div class="option-block">
+    <a href="#">CreatePetition</a>
+  </div>
+  <br>
+  <div class="option-block">
+    <a href="#">ViewPetition</a>
+  </div>
+  <div class="option-block">
+    <a href="#">Trackpetition</a>
+  </div>
+</div>-->
+
+<style>
+
+.badge {
+   font-size: 2em;
+   display: inline-block;
+   width: 20%;
+   height: 20%;
+   border-radius: 50%;
+   text-align: center;
+   line-height: 30px;
+}
+
+#sidebar {
+  width: 240px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #9E7C0C;
+  padding: 34px;
+}
+
+#sidebar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar li {
+  margin: 10px 0;
+}
+
+#sidebar a {
+  color: #fff;
+  text-decoration: none;
+}
+#sidebar-nav ul li.active a {
+  background: #fff;
+}
+#options-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.option-block {
+  width: 30%;
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(179, 153, 93, 0.2);
+  border-radius: 5px;
+}
+
+.option-block a {
+  color: #000;
+  text-decoration: none;
+  display: block;
+}
+#sidebar a {
+  color: #fff;
+  text-decoration: none;
+}
+
+#sidebar a.active {
+  color: #fff;
+  background-color: #275937;
+}
+#sidebar ul li.active a {
+  background: #275937;
+  color: #333;
+}
+#sidebar ul li:hover a {
+  background: #275937;
+  color: #333;
+}
+/*.well{
+    background-color:rgba(179, 153, 93, 0.2);
+}*/
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    color:#6C4D23;
+  }
+  .card {
+    background-color:rgba(179, 153, 93, 0.2);
+    padding: 20px;
+    text-align: center;
+  }
+  .page-header{
+  color:#6C4D23;
+  }
+</style>

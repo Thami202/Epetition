@@ -1,0 +1,9 @@
+title = "removepetition"
+layout = "default"
+url = "/removepetition/:id/"
+==
+<form action="/removepetition/{{ $this->param(id) }}" method="POST">
+   @method('DELETE')
+   @csrf
+   <input type="submit" value="Delete" />
+</form>

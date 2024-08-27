@@ -1,0 +1,8 @@
+columns:
+    petition_id:
+        label: Petitioner
+        type: number
+        
+    created_date:
+        label: created_at
+        type: datetime

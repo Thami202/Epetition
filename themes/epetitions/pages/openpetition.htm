@@ -1,0 +1,279 @@
+url = "/openpetition"
+layout = "default"
+title = "Open Petition"
+==
+<?php
+use Illuminate\Support\Request;
+use System\Models\File;
+use ApplicationException;
+use AhmadFatoni\ApiGenerator\Controllers\ApiGenerator\api\SignatureController;
+use Exception;
+use Http;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+
+function onStart() {
+
+  try{
+  $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller?filter=status_id:is:1');
+  
+  $petitions = json_decode($response)->data;
+  usort($petitions, function($a, $b) {
+    return strtotime($b->created_at) - strtotime($a->created_at);
+});
+  
+ 
+
+  // Add the signature count to each petition
+  foreach ($petitions as $petition) {
+    if(!empty($petition->id)){
+    $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/apigeneratorcontroller/'.$petition->id.'/signature-count');
+   // $signature_count = json_decode($response)->count;
+    //$petition->signature_count = $signature_count;
+    
+    $response_data = json_decode($response);
+if ($response_data && isset($response_data->count)) {
+  $signature_count = $response_data->count;
+  $petition->signature_count = $signature_count;
+} else {
+  $petition->signature_count = 0;
+}
+
+
+  
+
+
+    }
+}
+
+
+
+
+// Paginate the petitions array manually
+/*$currentPage = LengthAwarePaginator::resolveCurrentPage();
+$perPage = 10;
+$offset = ($currentPage - 1) * $perPage;
+$paginatedItems = array_slice($petitions, $offset, $perPage);
+$pagePetitions = new LengthAwarePaginator($paginatedItems, count($petitions), $perPage);
+$pagePetitions->setPath(url()->current());*/
+
+
+
+$this['petitions'] =  $petitions;
+
+
+
+        
+
+  
+   }
+      catch(ApplicationException $e) {
+          $this['petitions'] = collect();
+         // $this['signatureCounts'] = [];
+      }
+     
+  
+  }
+
+
+function onEnd() 
+{
+    $this->addCss('assets/vendor/dynatable/jquery.dynatable.css');
+    $this->addJs('assets/vendor/dynatable/jquery.dynatable.min.js');
+}
+  
+
+
+
+    function onSearch() 
+    {
+      // Get the search term from the request
+      $searchTerm = Input::get('searchTerm');
+    
+      try {
+        // Make an HTTP request to the API endpoint
+        $response = Http::get('http://localhost/epetition/api/v1/ahmadfatoni/petitions/search?searchTerm='.$searchTerm);
+        
+    
+        // Decode the JSON response and extract the data
+        $this['petitions']  = json_decode($response)->data;
+
+       
+        //var_dump('Something went wrong: ' . $response->body);
+        
+
+        if($response->code == 200)
+        {
+          // Return the search results view with the search term and data
+          \Log::info('Successful'.$response->body);
+
+          return [
+
+       '#workpspace' =>$this->renderPartial('search_results', [
+       'petitions' => $this['petitions'],
+       'searchTerm' => $searchTerm
+   ])
+      ];
+
+        }else{
+
+          \Log::info('Error'.$response->body);
+
+        }
+          
+
+        
+      } catch (\Exception $e) {
+        // Handle any errors
+        \Log::info('Error'.$response->body);
+        return $this->renderPartial('search_results', [
+        'petitions' => $this['petitions'],
+        'searchTerm' => $searchTerm
+    ]);
+    
+        
+      }
+    }
+    
+?>
+==
+
+
+
+
+
+<!--<div class="search">
+  <form action="http://localhost:8081/epetitionoctober/api/v1/ahmadfatoni/petitions/search" method="GET">
+    <input type="text" name="searchTerm" id="searchTerm" class="form-control" placeholder="Search Petitions" value="">
+    <br>
+    <button class="btn btn-default" data-request="onSearch" style="background-color:#9e7c0c;color:#ffffff;"
+      type="submit">Search </button>
+  </form>
+  <div id="workpspace"></div>
+</div>-->
+
+<br>
+<a class="btn btn-default" style="background-color:#9e7c0c;color:#ffffff;" href="{{ 'request-petition' |page }}">
+  Request Petition
+</a>
+<br>
+<br>
+
+
+
+
+<div class="row">
+  <div class="col-lg-6">
+    <table class="table story-headline"  id="petitions-table">
+      <thead style="background-color: #Efeade;">
+        <tr>
+          <th scope="col" style="color:#275937" data-dynatable-column="id">Petition#</th>
+          <th scope="col" style="color:#275937"  data-dynatable-column="title">Petition Title</th>
+          <th scope="col" style="color:#275937"  data-dynatable-column="user">Principal Petitioner</th>
+          <th scope="col" style="color:#275937" data-dynatable-column="status">Status</th>
+          <th scope="col" style="color:#275937" data-dynatable-column="signatures">Signatures</th>
+        </tr>
+      </thead>
+      <tbody class="story-headline">
+        {% if petitions is not empty  %}
+          {% for petition in petitions %}
+            <!--<tr style="word-wrap: break-word;">
+              <th scope="row">{{petition.id}}</th>
+              <td><a href="{{'petition/'~petition.id}}">{{petition.title}}</a></td>
+              <td><span><a href="{{'petition/'~petition.id}}">{{petition.user.name}}</a></span></td>
+              <td><span><a href="{{'petition/'~petition.id}}">{{petition.status.name}}</a></span></td>
+              <td><span><a href="{{'petition/'~petition.id}}">{{petition.signature_count}}</a></span></td>
+            </tr> -->
+            {% if not petition.reason %}
+            <tr style="word-wrap: break-word;">
+              <th scope="row">{{ petition.id }}</th>
+              <td>{{ petition.title }}</td>
+              <td>{{ petition.user.name }}</td>
+              <td>{{ petition.status.name }}</td>
+              <td>{{ petition.signature_count }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p>No petitions found.</p>
+        {% endif %}
+      </tbody>
+    </table>
+    {# pager(petitions) #}
+    {# petitions.render|raw #}
+
+
+  </div>
+</div>
+<style>
+  th a {
+    color: #275937;
+}
+  .count {
+
+    color: #6f777b;
+
+  }
+
+  .text {
+
+    color: #6f777b;
+
+  }
+
+  .search {
+    position: relative;
+    display: inline-block;
+  }
+
+  .search input[type="text"] {
+    padding-right: 900px;
+    /* Make room for the button */
+  }
+
+  .search button {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    background-color: #ccc;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .story-headline {
+    padding: 10px;
+    padding-left: 10px;
+    position: relative;
+    font-family: ff-dax-pro, sans-serif;
+    border-bottom: 1px solid #f6f3ec;
+    text-transform: uppercase;
+    letter-spacing: -0.7px;
+    line-height: 1.2;
+    color: #275937;
+
+  }
+
+  .story-headline:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: calc(100% - 4px);
+    left: 0;
+    top: 2px;
+  }
+
+  a {
+    line-height: inherit;
+    color: #275937;
+    text-decoration: none;
+    cursor: pointer;
+  }
+.row{
+  margin-left: -15px;
+  margin-right: -100%;
+}
+  
+</style>

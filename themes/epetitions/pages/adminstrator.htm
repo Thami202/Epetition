@@ -1,0 +1,102 @@
+title = "adminstrator"
+url = "/adminstrator"
+layout = "adminstrator"
+is_hidden = 0
+==
+<?php
+use Illuminate\Support\Arr;
+use RainLab\User\Models\User;
+
+
+function onStart()
+ {
+
+
+        if(Arr::has($response, 'id_token')) {
+           //Development Environment
+           $_client = new Client(['client_id' => '75432176991-js6qvkeb4nlkagcg8j02iaf0gpvdte6u.apps.googleusercontent.com']);
+            //production Environment
+          /// $_client = new Client(['client_id' => '15775916265-uc6degsmhdfac13s8b7ufnu1tdqittfq.apps.googleusercontent.com']);
+
+            $payload = $_client->verifyIdToken($response['id_token']);
+
+          //  dd($payload);
+            // Create a rainlab user using response from Google
+           
+            $user = User::findByEmail($payload['email']);
+
+            if(!$user) {
+                $user = User::register([
+                    'name' =>$user['name'],
+                    'surname' =>$user['surname'],
+                    'email'=>$user['email'],
+                    'password'=>bcrypt(str_random(16)),
+                    'confirm_password'=>bcrypt(str_random(16)),
+                    'username'=>$user['username']
+
+                ]);
+            }
+
+           
+
+            Auth::login($user);
+
+            return Redirect('/my-petitions');
+        }
+
+        
+    }
+       
+
+?>
+==
+{% if not user %}
+
+    <div class="row">
+
+        <div class="col-md-12">
+          <!--<a href =  "{{ 'forum'|page }}"-->
+          
+            <h3 >Sign in</h3> 
+            {% partial account ~ '::sign_in' %}
+
+            
+        </div>
+
+        <!--<div class="col-md-6" >
+            {#partial account ~ '::register' #}
+        </div>-->
+
+    </div>
+
+{% else %}
+
+    
+    {% partial account ~ '::activation_check' %}
+
+    {% partial account ~ '::update' %}
+
+    {% partial account ~ '::deactivate_link' %}
+
+{% endif %}
+
+
+
+<p><a href="{{ 'forgot-password'|page }}">Forgotten your password?</a></p>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const emailInput = document.querySelector('#userSigninLogin');
+      const passwordInput = document.querySelector('#userSigninPassword');
+  
+      const form = document.querySelector('form[name="signin"]');
+      form.addEventListener('submit', function(event) {
+          event.preventDefault();
+          emailInput.value = '';
+          passwordInput.value = '';
+      });
+  });
+  
+  
+  </script>
+?>
+==

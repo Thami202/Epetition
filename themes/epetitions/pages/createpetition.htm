@@ -1,0 +1,89 @@
+url = "/createpetition"
+layout = "default"
+title = "createpetition"
+==
+<?php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
+function onNext() {
+    return [
+        '#steps' => $this->renderPartial('petitions/steps', ['current' => post('step')]),
+        '@#login-row' => $this->renderPartial('petitions/step'.post('step'))
+    ];
+}
+
+function onCreatePetition()
+{
+   
+    $response = Http::post('http://lin-intranet.parliament.gov.za/api/v1/ahmadfatoni/apigeneratorcontroller', [
+    'id' =>Auth::getUser()->id,
+    'title' =>Input::get('title'),
+    'intended_to' => Input::get('intended_to'),
+    'description' =>Input::get('description'),
+]);
+
+ if($response->successful())
+ {
+    return redirect('/dashboard');
+ }else{
+   \Log::info($response->body());
+    
+    return  redirect('/createpetition');
+ }
+ 
+}
+
+/*public function callPostRequest() {
+    $response = Http::post('api/your-endpoint', [
+        'key' => 'value',
+        ...
+    ]);
+
+    return $response;
+}*/
+?>
+==
+<section id="portfolio" class="portfolio">
+    
+     <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+
+                        <div id="steps">
+                            {% partial 'petitions/steps' %}
+                        </div>
+                           
+                        <form data-request="onCreatePetition" id="login-form" class="form"">
+                         {{ form_token()}}
+                            {{ form_sessionKey()}}
+                            <h3 style="color:black;" class="text-center text-info">Create Petition</h3>
+
+                          
+                            {% partial 'petitions/step1' %}
+
+                            <!-- <div class="form-group">
+                            <label for="textAreaField" style="color:black;" class="text-info">Description</label><br> 
+                        <textarea name="description" class="form-control" id="textAreaField" rows="4"  cols="81" placeholder="indicate expected action from Parliament in response to the matters raised in the petition"></textarea> 
+                        </div>
+                      <div class="form-group">
+                             <input type="file" class="form-control" name="file_upload" />
+                             </div>
+
+                            <div class="form-group" >
+                                <br>
+                                <a href="./petitionrequest" >
+                        <input type="submit" style="background-color:#9e7c0c;color:#ffffff;" name="Create" class="btn btn-default" value="Lodge Petition"></a> -->
+                                
+                        </form>
+                      
+                    </div>
+                    
+            </div>
+        </div>
+      <div class="container">
+
+         <div class="row portfolio-container">
+             </div>         
+      </div>
+    </section><!--
